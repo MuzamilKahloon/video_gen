@@ -27,6 +27,7 @@ import ProjectDetailPage from "@pages/dashboard/ProjectDetailPage";
 import GalleryPage from "@pages/dashboard/GalleryPage";
 import SettingsPage from "@pages/dashboard/SettingsPage";
 import BillingPage from "@pages/dashboard/BillingPage";
+import AdminDashboard from "@pages/dashboard/AdminDashboard";
 
 function App() {
 	return (
@@ -57,6 +58,7 @@ function App() {
 				<Route path="gallery" element={<GalleryPage />} />
 				<Route path="settings" element={<SettingsPage />} />
 				<Route path="billing" element={<BillingPage />} />
+				<Route path="admin" element={<AdminDashboard />} />
 			</Route>
 
 			{/* 404 Route */}

@@ -1,559 +1,1025 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
-import { motion, AnimatePresence } from "framer-motion";
+// client/src/pages/dashboard/ProjectDetailPage.jsx
+import {useState, useEffect, useRef} from "react";
+import {useParams, useNavigate, Link} from "react-router-dom";
+import {Helmet} from "react-helmet-async";
+import {motion} from "framer-motion";
 import {
-  HiArrowLeft, HiDownload, HiShare, HiTrash, HiRefresh, HiPlay,
-  HiPause, HiVolumeUp, HiVolumeOff, HiExternalLink,
-  HiPhotograph, HiClock, HiExclamationCircle, HiLink,
-  HiDuplicate, HiPencil, HiX, HiChevronLeft, HiChevronRight
+	HiArrowLeft,
+	HiDownload,
+	HiShare,
+	HiTrash,
+	HiRefresh,
+	HiPlay,
+	HiPause,
+	HiVolumeUp,
+	HiVolumeOff,
+	HiDotsVertical,
+	HiExternalLink,
+	HiPhotograph,
+	HiClock,
+	HiCog,
+	HiCheckCircle,
+	HiExclamationCircle,
+	HiLink,
+	HiDuplicate,
+	HiPencil,
+	HiX,
+	HiChevronLeft,
+	HiChevronRight,
 } from "react-icons/hi";
-import { cn } from "@utils/cn";
-import { formatDate, formatDuration, formatFileSize } from "@utils/formatters";
+import {cn} from "@utils/cn";
+import {
+	formatDate,
+	formatRelativeTime,
+	formatDuration,
+	formatFileSize,
+} from "@utils/formatters";
+import {JOB_STATUS_CONFIG, VIDEO_TEMPLATES} from "@utils/constants";
+import Badge from "@components/ui/Badge";
+import StatusBadge from "@components/ui/StatusBadge";
+import Card from "@components/ui/Card";
+import Modal from "@components/ui/Modal";
+import Skeleton from "@components/ui/Skeleton";
+import Alert from "@components/ui/Alert";
+import Input from "@components/ui/Input";
+import Select from "@components/ui/Select";
+import {useProject} from "@hooks/useProject";
 import toast from "react-hot-toast";
 
-// Minimal components
-const AnimatedLine = ({ className = "" }) => (
-  <div className={`h-[1px] bg-gray-200 overflow-hidden ${className}`}>
-    <motion.div className="w-1/4 h-full bg-gradient-to-r from-transparent via-amber-400 to-transparent" animate={{ x: ["-100%", "400%"] }} transition={{ duration: 4, repeat: Infinity }} />
-  </div>
-);
+// Video Player Component
+const VideoPlayer = ({videoUrl, thumbnail, onClose, isModal = false}) => {
+	const [isPlaying, setIsPlaying] = useState(false);
+	const [isMuted, setIsMuted] = useState(false);
+	const [currentTime, setCurrentTime] = useState(0);
+	const [duration, setDuration] = useState(0);
+	const [showControls, setShowControls] = useState(true);
+	const videoRef = useRef(null);
 
-const StatusBadge = ({ status }) => {
-  const styles = {
-    completed: "bg-green-100 text-green-700", processing: "bg-amber-100 text-amber-700",
-    failed: "bg-red-100 text-red-700", draft: "bg-gray-100 text-gray-700",
-    queued: "bg-blue-100 text-blue-700"
-  };
-  return <span className={`px-3 py-1 text-xs font-medium rounded-full ${styles[status] || styles.draft}`}>{status?.charAt(0).toUpperCase() + status?.slice(1)}</span>;
+	const togglePlay = () => {
+		if (videoRef.current) {
+			if (isPlaying) {
+				videoRef.current.pause();
+			} else {
+				videoRef.current.play();
+			}
+			setIsPlaying(!isPlaying);
+		}
+	};
+
+	const toggleMute = () => {
+		if (videoRef.current) {
+			videoRef.current.muted = !isMuted;
+			setIsMuted(!isMuted);
+		}
+	};
+
+	const handleTimeUpdate = () => {
+		if (videoRef.current) {
+			setCurrentTime(videoRef.current.currentTime);
+		}
+	};
+
+	const handleLoadedMetadata = () => {
+		if (videoRef.current) {
+			setDuration(videoRef.current.duration);
+		}
+	};
+
+	const handleSeek = (e) => {
+		const rect = e.currentTarget.getBoundingClientRect();
+		const percent = (e.clientX - rect.left) / rect.width;
+		if (videoRef.current) {
+			videoRef.current.currentTime = percent * duration;
+		}
+	};
+
+	return (
+		<div
+			className={cn(
+				"relative bg-gray-900 rounded-xl overflow-hidden group",
+				"w-full aspect-video"
+			)}
+			onMouseEnter={() => setShowControls(true)}
+			onMouseLeave={() => !isPlaying && setShowControls(true)}
+		>
+			<video
+				ref={videoRef}
+				src={videoUrl}
+				poster={thumbnail}
+				className="w-full h-full object-cover"
+				onTimeUpdate={handleTimeUpdate}
+				onLoadedMetadata={handleLoadedMetadata}
+				onEnded={() => setIsPlaying(false)}
+				onClick={togglePlay}
+			/>
+
+			{/* Play button overlay */}
+			{!isPlaying && (
+				<div className="absolute inset-0 flex items-center justify-center bg-black/30">
+					<button
+						onClick={togglePlay}
+						className="w-20 h-20 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-all shadow-xl hover:scale-105"
+					>
+						<HiPlay className="w-10 h-10 text-gray-900 ml-1" />
+					</button>
+				</div>
+			)}
+
+			{/* Controls */}
+			<div
+				className={cn(
+					"absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity duration-300",
+					showControls || !isPlaying ? "opacity-100" : "opacity-0"
+				)}
+			>
+				{/* Progress bar */}
+				<div
+					className="w-full h-1 bg-white/30 rounded-full mb-3 cursor-pointer"
+					onClick={handleSeek}
+				>
+					<div
+						className="h-full bg-white rounded-full transition-all"
+						style={{width: `${duration ? (currentTime / duration) * 100 : 0}%`}}
+					/>
+				</div>
+
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-3">
+						<button
+							onClick={togglePlay}
+							className="w-8 h-8 flex items-center justify-center text-white hover:text-primary-400 transition-colors"
+						>
+							{isPlaying ? (
+								<HiPause className="w-6 h-6" />
+							) : (
+								<HiPlay className="w-6 h-6" />
+							)}
+						</button>
+
+						<button
+							onClick={toggleMute}
+							className="w-8 h-8 flex items-center justify-center text-white hover:text-primary-400 transition-colors"
+						>
+							{isMuted ? (
+								<HiVolumeOff className="w-5 h-5" />
+							) : (
+								<HiVolumeUp className="w-5 h-5" />
+							)}
+						</button>
+
+						<span className="text-sm text-white/80">
+							{formatDuration(Math.floor(currentTime))} /{" "}
+							{formatDuration(Math.floor(duration))}
+						</span>
+					</div>
+
+					{isModal && onClose && (
+						<button
+							onClick={onClose}
+							className="w-8 h-8 flex items-center justify-center text-white hover:text-primary-400 transition-colors"
+						>
+							<HiX className="w-5 h-5" />
+						</button>
+					)}
+				</div>
+			</div>
+		</div>
+	);
 };
 
-const Button = ({ children, className = "", ...props }) => <button className={`px-4 py-2 font-medium rounded-lg transition-all ${className}`} {...props}>{children}</button>;
+// Image Gallery Component
+const ImageGallery = ({images}) => {
+	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
-const Card = ({ children, className = "", hover = true }) => (
-  <div className={`bg-white border border-gray-200 rounded-2xl ${hover ? "hover:border-gray-300 hover:shadow-xl" : ""} transition-all ${className}`}>
-    {children}
-  </div>
-);
+	if (!images || images.length === 0) {
+		return (
+			<div className="aspect-video bg-gray-100 rounded-xl flex items-center justify-center">
+				<p className="text-gray-500">No images available</p>
+			</div>
+		);
+	}
 
-const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className={`bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-${size} max-h-[90vh] overflow-y-auto`} onClick={(e) => e.stopPropagation()}>
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-xl font-normal text-black">{title}</h2>
-          <Button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"><HiX className="w-5 h-5" /></Button>
-        </div>
-        <div className="p-6">{children}</div>
-      </motion.div>
-    </div>
-  );
+	const goToPrevious = () => {
+		setSelectedIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+	};
+
+	const goToNext = () => {
+		setSelectedIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+	};
+
+	return (
+		<div>
+			{/* Main Image */}
+			<div
+				className="relative aspect-video bg-gray-100 rounded-xl overflow-hidden mb-3 cursor-pointer group"
+				onClick={() => setIsModalOpen(true)}
+			>
+				<img
+					src={images[selectedIndex]?.url || images[selectedIndex]?.thumbnail}
+					alt={images[selectedIndex]?.caption || `Image ${selectedIndex + 1}`}
+					className="w-full h-full object-cover"
+				/>
+				<div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+					<div className="opacity-0 group-hover:opacity-100 transition-opacity">
+						<div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
+							<HiPhotograph className="w-6 h-6 text-gray-700" />
+						</div>
+					</div>
+				</div>
+
+				{/* Navigation arrows */}
+				{images.length > 1 && (
+					<>
+						<button
+							onClick={(e) => {
+								e.stopPropagation();
+								goToPrevious();
+							}}
+							className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+						>
+							<HiChevronLeft className="w-5 h-5 text-gray-700" />
+						</button>
+						<button
+							onClick={(e) => {
+								e.stopPropagation();
+								goToNext();
+							}}
+							className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+						>
+							<HiChevronRight className="w-5 h-5 text-gray-700" />
+						</button>
+					</>
+				)}
+
+				{/* Image counter */}
+				<div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded-md text-xs text-white">
+					{selectedIndex + 1} / {images.length}
+				</div>
+			</div>
+
+			{/* Thumbnail strip */}
+			<div className="flex gap-2 overflow-x-auto pb-2">
+				{images.map((image, index) => (
+					<button
+						key={image._id || index}
+						onClick={() => setSelectedIndex(index)}
+						className={cn(
+							"flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all",
+							selectedIndex === index
+								? "border-primary-500 ring-2 ring-primary-100"
+								: "border-transparent hover:border-gray-300"
+						)}
+					>
+						<img
+							src={image.thumbnail || image.url}
+							alt={image.caption || `Thumbnail ${index + 1}`}
+							className="w-full h-full object-cover"
+						/>
+					</button>
+				))}
+			</div>
+
+			{/* Fullscreen Modal */}
+			<Modal
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				size="xl"
+				title={images[selectedIndex]?.caption || "Image Preview"}
+			>
+				<div className="relative">
+					<img
+						src={images[selectedIndex]?.url}
+						alt={images[selectedIndex]?.caption}
+						className="w-full rounded-lg"
+					/>
+					{images.length > 1 && (
+						<div className="flex justify-center gap-4 mt-4">
+							<button onClick={goToPrevious} className="btn-secondary btn-sm">
+								<HiChevronLeft className="w-4 h-4" />
+								Previous
+							</button>
+							<button onClick={goToNext} className="btn-secondary btn-sm">
+								Next
+								<HiChevronRight className="w-4 h-4" />
+							</button>
+						</div>
+					)}
+				</div>
+			</Modal>
+		</div>
+	);
 };
 
-const VideoPlayer = ({ videoUrl, thumbnail }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [showControls, setShowControls] = useState(true);
-  const videoRef = useRef(null);
+// Processing Steps Component
+const ProcessingSteps = ({steps}) => {
+	if (!steps || steps.length === 0) return null;
 
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
+	return (
+		<div className="space-y-3">
+			{steps.map((step, index) => {
+				const isCompleted = step.status === "completed";
+				const isActive = step.status === "processing";
+				const isPending = step.status === "pending";
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
+				return (
+					<div key={step.name} className="flex items-center gap-3">
+						<div
+							className={cn(
+								"flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+								isCompleted && "bg-success-100 text-success-600",
+								isActive && "bg-primary-100 text-primary-600",
+								isPending && "bg-gray-100 text-gray-400"
+							)}
+						>
+							{isCompleted ? (
+								<HiCheckCircle className="w-5 h-5" />
+							) : isActive ? (
+								<div className="w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
+							) : (
+								<span className="text-sm font-medium">{index + 1}</span>
+							)}
+						</div>
 
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-    }
-  };
-
-  const handleSeek = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    if (videoRef.current) {
-      videoRef.current.currentTime = percent * duration;
-    }
-  };
-
-  return (
-    <div className="relative bg-black rounded-2xl overflow-hidden group w-full aspect-video" onMouseEnter={() => setShowControls(true)} onMouseLeave={() => !isPlaying && setShowControls(true)}>
-      <video ref={videoRef} src={videoUrl} poster={thumbnail} className="w-full h-full object-cover" onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onEnded={() => setIsPlaying(false)} onClick={togglePlay} />
-      {!isPlaying && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-          <Button onClick={togglePlay} className="w-20 h-20 bg-amber-500 hover:bg-amber-600 rounded-full flex items-center justify-center shadow-xl">
-            <HiPlay className="w-10 h-10 text-white ml-1" />
-          </Button>
-        </div>
-      )}
-      <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 transition-opacity duration-300 ${showControls || !isPlaying ? "opacity-100" : "opacity-0"}`}>
-        <div className="w-full h-1 bg-gray-700 rounded-full mb-3 cursor-pointer" onClick={handleSeek}>
-          <div className="h-full bg-amber-500 rounded-full" style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }} />
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button onClick={togglePlay} className="w-8 h-8 text-white hover:text-amber-500">
-              {isPlaying ? <HiPause className="w-6 h-6" /> : <HiPlay className="w-6 h-6" />}
-            </Button>
-            <Button onClick={toggleMute} className="w-8 h-8 text-white hover:text-amber-500">
-              {isMuted ? <HiVolumeOff className="w-5 h-5" /> : <HiVolumeUp className="w-5 h-5" />}
-            </Button>
-            <span className="text-sm text-gray-300">{formatDuration(Math.floor(currentTime))} / {formatDuration(Math.floor(duration))}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+						<div className="flex-1">
+							<p
+								className={cn(
+									"text-sm font-medium",
+									isCompleted && "text-gray-900",
+									isActive && "text-primary-600",
+									isPending && "text-gray-400"
+								)}
+							>
+								{step.name}
+							</p>
+							{step.duration && isCompleted && (
+								<p className="text-xs text-gray-500">
+									Completed in {step.duration}s
+								</p>
+							)}
+						</div>
+					</div>
+				);
+			})}
+		</div>
+	);
 };
 
-const ImageGallery = ({ images }) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+// Edit Settings Modal Component
+const EditSettingsModal = ({isOpen, onClose, project, onSave, loading}) => {
+	const [formData, setFormData] = useState({
+		title: project?.title || "",
+		description: project?.description || "",
+	});
 
-  if (!images?.length) return <div className="aspect-video bg-gray-100 rounded-2xl flex items-center justify-center"><p className="text-gray-400">No images available</p></div>;
+	useEffect(() => {
+		if (project) {
+			setFormData({
+				title: project.title || "",
+				description: project.description || "",
+			});
+		}
+	}, [project]);
 
-  return (
-    <div>
-      <div className="relative aspect-video bg-gray-100 rounded-2xl overflow-hidden mb-3 cursor-pointer group" onClick={() => setIsModalOpen(true)}>
-        <img src={images[selectedIndex]?.url} alt={`Image ${selectedIndex + 1}`} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center"><HiPhotograph className="w-6 h-6 text-white" /></div>
-          </div>
-        </div>
-        {images.length > 1 && (
-          <>
-            <Button onClick={(e) => { e.stopPropagation(); setSelectedIndex(prev => prev === 0 ? images.length - 1 : prev - 1); }} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/90 hover:bg-black rounded-full opacity-0 group-hover:opacity-100">
-              <HiChevronLeft className="w-5 h-5 text-white" />
-            </Button>
-            <Button onClick={(e) => { e.stopPropagation(); setSelectedIndex(prev => prev === images.length - 1 ? 0 : prev + 1); }} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/90 hover:bg-black rounded-full opacity-0 group-hover:opacity-100">
-              <HiChevronRight className="w-5 h-5 text-white" />
-            </Button>
-          </>
-        )}
-        <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded-md text-xs text-white">{selectedIndex + 1} / {images.length}</div>
-      </div>
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {images.map((image, index) => (
-          <Button key={index} onClick={() => setSelectedIndex(index)} className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 ${selectedIndex === index ? "border-amber-500 ring-2 ring-amber-500/20" : "border-transparent hover:border-gray-300"}`}>
-            <img src={image.thumbnail || image.url} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
-          </Button>
-        ))}
-      </div>
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} size="xl" title="Image Preview">
-        <div className="relative">
-          <img src={images[selectedIndex]?.url} alt={`Image ${selectedIndex + 1}`} className="w-full rounded-lg" />
-          {images.length > 1 && (
-            <div className="flex justify-center gap-4 mt-4">
-              <Button onClick={() => setSelectedIndex(prev => prev === 0 ? images.length - 1 : prev - 1)} className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-600 hover:border-amber-400">
-                <HiChevronLeft className="w-4 h-4" /> Previous
-              </Button>
-              <Button onClick={() => setSelectedIndex(prev => prev === images.length - 1 ? 0 : prev + 1)} className="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-600 hover:border-amber-400">
-                Next <HiChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
-        </div>
-      </Modal>
-    </div>
-  );
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		onSave(formData);
+	};
+
+	return (
+		<Modal isOpen={isOpen} onClose={onClose} title="Edit Project Settings">
+			<form onSubmit={handleSubmit} className="p-6 space-y-4">
+				<Input
+					label="Project Title"
+					value={formData.title}
+					onChange={(e) => setFormData({...formData, title: e.target.value})}
+					placeholder="Enter project title"
+				/>
+
+				<div>
+					<label className="label">Description</label>
+					<textarea
+						value={formData.description}
+						onChange={(e) =>
+							setFormData({...formData, description: e.target.value})
+						}
+						placeholder="Enter project description (optional)"
+						className="input min-h-[100px]"
+					/>
+				</div>
+
+				<div className="flex gap-3 pt-4">
+					<button
+						type="button"
+						onClick={onClose}
+						className="btn-secondary btn-md flex-1"
+					>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						disabled={loading}
+						className="btn-primary btn-md flex-1"
+					>
+						{loading ? "Saving..." : "Save Changes"}
+					</button>
+				</div>
+			</form>
+		</Modal>
+	);
 };
 
-export default function ProjectDetailPage() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [project, setProject] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
+// Main Component
+const ProjectDetailPage = () => {
+	const {id} = useParams();
+	const navigate = useNavigate();
+	const {fetchProject, updateProject, deleteProject, loading} = useProject();
 
-  // Mock project data
-  useEffect(() => {
-    setTimeout(() => {
-      setProject({
-        _id: id,
-        title: "Real Estate Walkthrough Video",
-        status: "completed",
-        createdAt: new Date().toISOString(),
-        completedAt: new Date().toISOString(),
-        sourceUrl: "https://example.com/listing",
-        sourceType: "url",
-        images: [
-          { url: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&auto=format&fit=crop", thumbnail: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=200&auto=format&fit=crop" },
-          { url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop", thumbnail: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&auto=format&fit=crop" },
-          { url: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&auto=format&fit=crop", thumbnail: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200&auto=format&fit=crop" }
-        ],
-        video: {
-          url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          format: "mp4",
-          width: 1920,
-          height: 1080,
-          size: 12582912
-        },
-        settings: {
-          template: "real-estate",
-          quality: "1080p",
-          aspectRatio: "16:9",
-          duration: 30
-        },
-        creditsUsed: 15,
-        description: "A beautiful walkthrough video of a modern apartment"
-      });
-      setIsLoading(false);
-    }, 800);
-  }, [id]);
+	const [project, setProject] = useState(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [showShareModal, setShowShareModal] = useState(false);
+	const [showEditModal, setShowEditModal] = useState(false);
+	const [actionLoading, setActionLoading] = useState(false);
 
-  const handleDelete = async () => {
-    setActionLoading(true);
-    await new Promise(r => setTimeout(r, 800));
-    setActionLoading(false);
-    setShowDeleteModal(false);
-    navigate("/dashboard/projects");
-    toast.success("Project deleted successfully");
-  };
+	// Fetch project on mount
+	useEffect(() => {
+		const loadProject = async () => {
+			setIsLoading(true);
+			const result = await fetchProject(id);
+			if (result.success) {
+				setProject(result.data);
+			} else {
+				toast.error("Failed to load project");
+			}
+			setIsLoading(false);
+		};
+		loadProject();
+	}, [id]);
 
-  const handleDuplicate = async () => {
-    setActionLoading(true);
-    await new Promise(r => setTimeout(r, 800));
-    setActionLoading(false);
-    toast.success("Project duplicated successfully!");
-  };
+	// Poll for status updates if processing
+	useEffect(() => {
+		if (project?.status === "processing") {
+			const interval = setInterval(async () => {
+				const result = await fetchProject(id);
+				if (result.success) {
+					setProject(result.data);
+					if (result.data.status !== "processing") {
+						clearInterval(interval);
+						if (result.data.status === "completed") {
+							toast.success("Video generation completed!");
+						} else if (result.data.status === "failed") {
+							toast.error("Video generation failed");
+						}
+					}
+				}
+			}, 5000); // Poll every 5 seconds
 
-  const handleEditSave = async (formData) => {
-    setActionLoading(true);
-    await new Promise(r => setTimeout(r, 800));
-    setProject(prev => ({ ...prev, ...formData }));
-    setActionLoading(false);
-    setShowEditModal(false);
-    toast.success("Project updated successfully!");
-  };
+			return () => clearInterval(interval);
+		}
+	}, [project?.status, id]);
 
-  const handleDownload = (format = "mp4") => {
-    toast.success(`Downloading as ${format.toUpperCase()}...`);
-  };
+	const handleDelete = async () => {
+		setActionLoading(true);
+		const result = await deleteProject(id);
+		setActionLoading(false);
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(project?.video?.url || "");
-    toast.success("Link copied to clipboard!");
-  };
+		if (result.success) {
+			setShowDeleteModal(false);
+			navigate("/dashboard/projects");
+		}
+	};
 
-  const handleRetry = () => toast.info("Retrying generation...");
+	const handleDuplicate = async () => {
+		setActionLoading(true);
+		try {
+			// Create a new project with the same settings
+			const {createProject} = await import("@services/project.service").then(
+				(m) => m.default
+			);
+			const response = await createProject({
+				title: `${project.title} (Copy)`,
+				description: project.description,
+				sourceUrl: project.sourceUrl,
+				sourceType: project.sourceType,
+				settings: project.settings,
+			});
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-black p-6">
-      <div className="mb-8">
-        <div className="h-10 bg-gray-100 rounded-xl animate-pulse w-64" />
-        <div className="h-4 bg-gray-100 rounded mt-2 w-96" />
-      </div>
-      <div className="grid grid-cols-3 gap-6">
-        {[...Array(3)].map((_, i) => <div key={i} className="h-40 bg-gray-100 rounded-2xl animate-pulse" />)}
-      </div>
-    </div>
-  );
+			toast.success("Project duplicated successfully!");
+			navigate(`/dashboard/projects/${response.data.project._id}`);
+		} catch (err) {
+			toast.error("Failed to duplicate project");
+		} finally {
+			setActionLoading(false);
+		}
+	};
 
-  if (!project) return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-black p-6">
-      <div className="bg-red-100 border border-red-200 rounded-2xl p-6 mb-4">
-        <h3 className="font-medium text-red-700 mb-2">Project not found</h3>
-        <p className="text-red-700">The project doesn't exist or has been deleted.</p>
-      </div>
-      <Link to="/dashboard/projects" className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg">
-        <HiArrowLeft className="w-4 h-4" />Back to Projects
-      </Link>
-    </div>
-  );
+	const handleEditSave = async (formData) => {
+		setActionLoading(true);
+		const result = await updateProject(id, formData);
+		setActionLoading(false);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-black p-4 md:p-6 lg:p-8">
-      <Helmet><title>{project.title} - VideoGen AI</title></Helmet>
-      <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-400/5 rounded-full blur-[150px]" />
-      </div>
-      
-      <div className="max-w-7xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button onClick={() => navigate("/dashboard/projects")} className="p-2 hover:bg-gray-100 rounded-lg border border-gray-200">
-              <HiArrowLeft className="w-5 h-5 text-gray-600" />
-            </Button>
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-3xl font-light text-black">{project.title}</h1>
-                <StatusBadge status={project.status} />
-              </div>
-              <p className="text-gray-500">Created {formatDate(project.createdAt)}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {project.status === "completed" && (
-              <>
-                <Button onClick={() => setShowShareModal(true)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black rounded-lg">
-                  <HiShare className="w-4 h-4" /> Share
-                </Button>
-                <Button onClick={() => handleDownload()} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg shadow-lg">
-                  <HiDownload className="w-4 h-4" /> Download
-                </Button>
-              </>
-            )}
-            {project.status === "failed" && (
-              <Button onClick={handleRetry} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg">
-                <HiRefresh className="w-4 h-4" /> Retry
-              </Button>
-            )}
-          </div>
-        </motion.div>
+		if (result.success) {
+			setProject({...project, ...formData});
+			setShowEditModal(false);
+			toast.success("Project updated successfully!");
+		}
+	};
 
-        {project.status === "processing" && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <Card hover={false} className="p-6">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-gray-600">Processing...</span>
-                <span className="text-gray-500">45%</span>
-              </div>
-              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                <motion.div className="h-full bg-gradient-to-r from-amber-500 to-orange-500" initial={{ width: 0 }} animate={{ width: "45%" }} />
-              </div>
-            </Card>
-          </motion.div>
-        )}
+	const handleDownload = (format = "mp4") => {
+		if (!project?.video?.url) {
+			toast.error("Video not available for download");
+			return;
+		}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <Card>
-              <VideoPlayer videoUrl={project.video?.url} thumbnail={project.images?.[0]?.thumbnail} />
-            </Card>
-            <Card>
-              <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <HiPhotograph className="w-5 h-5 text-gray-500" />
-                  <h3 className="font-medium text-black">Source Images</h3>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">{project.images?.length || 0} images</span>
-                </div>
-                {project.sourceUrl && (
-                  <a href={project.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:text-amber-700 text-sm font-medium">
-                    <HiExternalLink className="w-4 h-4" /> View Listing
-                  </a>
-                )}
-              </div>
-              <div className="p-6">
-                <ImageGallery images={project.images || []} />
-              </div>
-            </Card>
-          </div>
+		const link = document.createElement("a");
+		link.href = project.video.url;
+		link.download = `${project.title.replace(/\s+/g, "_")}.${format}`;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		toast.success("Download started!");
+	};
 
-          <div className="space-y-8">
-            <Card>
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="font-medium text-black">Project Details</h3>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Status</span>
-                  <StatusBadge status={project.status} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Template</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🏠</span>
-                    <span className="font-medium">{project.settings?.template || "Custom"}</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Quality</span>
-                  <span className="font-medium">{project.settings?.quality || "1080p"}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Aspect Ratio</span>
-                  <span className="font-medium">{project.settings?.aspectRatio || "16:9"}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Duration</span>
-                  <span className="font-medium">{project.settings?.duration || 30}s</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Credits Used</span>
-                  <span className="font-medium">{project.creditsUsed || 0} credits</span>
-                </div>
-                <div className="pt-4 border-t border-gray-200 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Created</span>
-                    <span className="text-gray-500">{formatDate(project.createdAt)}</span>
-                  </div>
-                  {project.completedAt && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Completed</span>
-                      <span className="text-gray-500">{formatDate(project.completedAt)}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Card>
+	const handleCopyLink = () => {
+		if (project?.video?.url) {
+			navigator.clipboard.writeText(project.video.url);
+			toast.success("Link copied to clipboard!");
+		}
+	};
 
-            {project.status === "completed" && project.video && (
-              <Card>
-                <div className="p-6 border-b border-gray-200">
-                  <h3 className="font-medium text-black">Video File</h3>
-                </div>
-                <div className="p-6 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Format</span>
-                    <span className="font-medium uppercase">{project.video.format || "mp4"}</span>
-                  </div>
-                  {project.video.width && project.video.height && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Resolution</span>
-                      <span className="font-medium">{project.video.width}x{project.video.height}</span>
-                    </div>
-                  )}
-                  {project.video.size && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">File Size</span>
-                      <span className="font-medium">{formatFileSize(project.video.size)}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-6 pt-0">
-                  <Button onClick={() => handleDownload("mp4")} className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white">
-                    <HiDownload className="w-4 h-4" /> Download MP4
-                  </Button>
-                </div>
-              </Card>
-            )}
+	const handleRetry = async () => {
+		// Navigate to regenerate or trigger regeneration
+		toast.info("Retry functionality coming soon");
+	};
 
-            {project.sourceUrl && (
-              <Card>
-                <div className="p-6 border-b border-gray-200 flex items-center gap-2">
-                  <HiLink className="w-5 h-5 text-gray-500" />
-                  <h3 className="font-medium text-black">Source URL</h3>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={project.sourceUrl}
-                      readOnly
-                      className="flex-1 bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 outline-none text-sm text-gray-700"
-                    />
-                    <Button onClick={() => navigator.clipboard.writeText(project.sourceUrl)} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg">
-                      <HiDuplicate className="w-4 h-4 text-gray-600" />
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            )}
+	if (isLoading) {
+		return (
+			<div className="p-6">
+				<div className="flex items-center gap-4 mb-6">
+					<Skeleton className="w-10 h-10 rounded-lg" />
+					<div>
+						<Skeleton className="h-6 w-48 mb-2" />
+						<Skeleton className="h-4 w-32" />
+					</div>
+				</div>
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+					<div className="lg:col-span-2">
+						<Skeleton className="aspect-video rounded-xl mb-6" />
+						<Skeleton className="h-40 rounded-xl" />
+					</div>
+					<div>
+						<Skeleton className="h-80 rounded-xl" />
+					</div>
+				</div>
+			</div>
+		);
+	}
 
-            <Card>
-              <div className="p-6 space-y-2">
-                <Button onClick={handleDuplicate} disabled={actionLoading} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 text-gray-700">
-                  <HiDuplicate className="w-4 h-4" /> Duplicate Project
-                </Button>
-                <Button onClick={() => setShowEditModal(true)} disabled={!["draft", "failed"].includes(project.status)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 text-gray-700">
-                  <HiPencil className="w-4 h-4" /> Edit Settings
-                </Button>
-                <Button onClick={() => setShowDeleteModal(true)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-red-50 text-red-600 hover:text-red-700">
-                  <HiTrash className="w-4 h-4" /> Delete Project
-                </Button>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </div>
+	if (!project) {
+		return (
+			<div className="p-6">
+				<Alert variant="error" title="Project not found">
+					The project you're looking for doesn't exist or has been deleted.
+				</Alert>
+				<Link to="/dashboard/projects" className="btn-primary btn-md mt-4">
+					<HiArrowLeft className="w-4 h-4" />
+					Back to Projects
+				</Link>
+			</div>
+		);
+	}
 
-      {/* Modals */}
-      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Delete Project" size="sm">
-        <div className="space-y-6">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <HiTrash className="w-8 h-8 text-red-600" />
-            </div>
-            <h3 className="text-xl font-medium text-black mb-2">Delete "{project.title}"?</h3>
-            <p className="text-gray-600">This action cannot be undone.</p>
-          </div>
-          <div className="flex gap-3">
-            <Button onClick={() => setShowDeleteModal(false)} className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black rounded-lg">
-              Cancel
-            </Button>
-            <Button onClick={handleDelete} disabled={actionLoading} className="flex-1 px-6 py-3 bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 rounded-lg">
-              {actionLoading ? "Deleting..." : "Delete"}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+	const template = VIDEO_TEMPLATES.find(
+		(t) => t.id === project.settings?.template
+	);
 
-      <Modal isOpen={showShareModal} onClose={() => setShowShareModal(false)} title="Share Video">
-        <div className="space-y-4">
-          <p className="text-gray-600">Share this video with a direct link.</p>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={project.video?.url || ""}
-              readOnly
-              className="flex-1 bg-gray-100 border border-gray-200 rounded-lg px-3 py-2 outline-none text-gray-700"
-            />
-            <Button onClick={handleCopyLink} className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg">
-              <HiDuplicate className="w-4 h-4" /> Copy
-            </Button>
-          </div>
-        </div>
-      </Modal>
+	return (
+		<>
+			<Helmet>
+				<title>{project.title} - VideoGen AI</title>
+			</Helmet>
 
-      <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Project">
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          handleEditSave({
-            title: e.target.title.value,
-            description: e.target.description.value
-          });
-        }} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-2">Title</label>
-            <input
-              name="title"
-              defaultValue={project.title}
-              className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2.5 text-black outline-none focus:border-amber-400"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-2">Description</label>
-            <textarea
-              name="description"
-              defaultValue={project.description}
-              className="w-full bg-gray-100 border border-gray-200 rounded-lg px-4 py-2.5 text-black outline-none focus:border-amber-400 min-h-[100px]"
-            />
-          </div>
-          <div className="flex gap-3 pt-4">
-            <Button type="button" onClick={() => setShowEditModal(false)} className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black rounded-lg">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={actionLoading} className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg">
-              {actionLoading ? "Saving..." : "Save"}
-            </Button>
-          </div>
-        </form>
-      </Modal>
-    </div>
-  );
-}
+			<div className="p-6">
+				{/* Header */}
+				<div className="flex items-start justify-between mb-6">
+					<div className="flex items-center gap-4">
+						<button
+							onClick={() => navigate("/dashboard/projects")}
+							className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+						>
+							<HiArrowLeft className="w-5 h-5 text-gray-600" />
+						</button>
+						<div>
+							<div className="flex items-center gap-3">
+								<h1 className="text-2xl font-bold text-gray-900">
+									{project.title}
+								</h1>
+								<StatusBadge status={project.status} />
+							</div>
+							<p className="text-sm text-gray-500 mt-1">
+								Created {formatRelativeTime(project.createdAt)} · ID:{" "}
+								{project._id}
+							</p>
+						</div>
+					</div>
+
+					<div className="flex items-center gap-2">
+						{project.status === "completed" && (
+							<>
+								<button
+									onClick={() => setShowShareModal(true)}
+									className="btn-secondary btn-md"
+								>
+									<HiShare className="w-4 h-4" />
+									Share
+								</button>
+								<button
+									onClick={() => handleDownload()}
+									className="btn-primary btn-md"
+								>
+									<HiDownload className="w-4 h-4" />
+									Download
+								</button>
+							</>
+						)}
+
+						{project.status === "failed" && (
+							<button onClick={handleRetry} className="btn-primary btn-md">
+								<HiRefresh className="w-4 h-4" />
+								Retry
+							</button>
+						)}
+					</div>
+				</div>
+
+				{/* Progress Bar for Processing */}
+				{project.status === "processing" && (
+					<Card className="mb-6">
+						<Card.Body>
+							<div className="flex items-center justify-between mb-2">
+								<span className="text-sm font-medium text-gray-700">
+									{project.statusMessage || "Processing..."}
+								</span>
+								<span className="text-sm text-gray-500">
+									{project.progress || 0}%
+								</span>
+							</div>
+							<div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+								<div
+									className="h-full bg-primary-600 transition-all duration-500"
+									style={{width: `${project.progress || 0}%`}}
+								/>
+							</div>
+						</Card.Body>
+					</Card>
+				)}
+
+				{/* Main Content */}
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+					{/* Left Column - Video/Preview */}
+					<div className="lg:col-span-2 space-y-6">
+						{/* Video Player or Preview */}
+						<Card>
+							<Card.Body className="p-0">
+								{project.status === "completed" && project.video ? (
+									<VideoPlayer
+										videoUrl={project.video.url}
+										thumbnail={project.images?.[0]?.thumbnail}
+									/>
+								) : project.status === "processing" ? (
+									<div className="aspect-video bg-gray-100 rounded-xl flex flex-col items-center justify-center">
+										<div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4" />
+										<p className="text-lg font-medium text-gray-900 mb-2">
+											Generating your video...
+										</p>
+										<p className="text-sm text-gray-500">
+											This usually takes 2-5 minutes
+										</p>
+									</div>
+								) : project.status === "failed" ? (
+									<div className="aspect-video bg-error-50 rounded-xl flex flex-col items-center justify-center">
+										<HiExclamationCircle className="w-16 h-16 text-error-500 mb-4" />
+										<p className="text-lg font-medium text-gray-900 mb-2">
+											Video generation failed
+										</p>
+										<p className="text-sm text-gray-500 mb-4">
+											{project.errorMessage ||
+												"There was an error processing your video"}
+										</p>
+										<button
+											onClick={handleRetry}
+											className="btn-primary btn-md"
+										>
+											<HiRefresh className="w-4 h-4" />
+											Try Again
+										</button>
+									</div>
+								) : (
+									<div className="aspect-video bg-gray-100 rounded-xl flex flex-col items-center justify-center">
+										<HiClock className="w-16 h-16 text-gray-400 mb-4" />
+										<p className="text-lg font-medium text-gray-900 mb-2">
+											{project.status === "draft"
+												? "Ready to generate"
+												: "Waiting in queue"}
+										</p>
+										<p className="text-sm text-gray-500">
+											{project.status === "draft"
+												? "Configure your settings and start generation"
+												: "Your video will start processing soon"}
+										</p>
+									</div>
+								)}
+							</Card.Body>
+						</Card>
+
+						{/* Source Images */}
+						<Card>
+							<Card.Header>
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-2">
+										<HiPhotograph className="w-5 h-5 text-gray-500" />
+										<h3 className="font-semibold text-gray-900">
+											Source Images
+										</h3>
+										<Badge variant="gray">
+											{project.images?.length || 0} images
+										</Badge>
+									</div>
+									{project.sourceUrl && (
+										<a
+											href={project.sourceUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="btn-ghost btn-sm text-primary-600"
+										>
+											<HiExternalLink className="w-4 h-4" />
+											View Listing
+										</a>
+									)}
+								</div>
+							</Card.Header>
+							<Card.Body>
+								<ImageGallery images={project.images || []} />
+							</Card.Body>
+						</Card>
+					</div>
+
+					{/* Right Column - Details */}
+					<div className="space-y-6">
+						{/* Project Info */}
+						<Card>
+							<Card.Header>
+								<h3 className="font-semibold text-gray-900">Project Details</h3>
+							</Card.Header>
+							<Card.Body className="space-y-4">
+								<div className="flex items-center justify-between">
+									<span className="text-sm text-gray-500">Status</span>
+									<StatusBadge status={project.status} />
+								</div>
+
+								<div className="flex items-center justify-between">
+									<span className="text-sm text-gray-500">Template</span>
+									<div className="flex items-center gap-2">
+										<span>{template?.icon}</span>
+										<span className="text-sm font-medium text-gray-900">
+											{template?.name || project.settings?.template}
+										</span>
+									</div>
+								</div>
+
+								<div className="flex items-center justify-between">
+									<span className="text-sm text-gray-500">Quality</span>
+									<span className="text-sm font-medium text-gray-900">
+										{project.settings?.quality || "1080p"}
+									</span>
+								</div>
+
+								<div className="flex items-center justify-between">
+									<span className="text-sm text-gray-500">Aspect Ratio</span>
+									<span className="text-sm font-medium text-gray-900">
+										{project.settings?.aspectRatio || "16:9"}
+									</span>
+								</div>
+
+								{project.settings?.duration && (
+									<div className="flex items-center justify-between">
+										<span className="text-sm text-gray-500">Duration</span>
+										<span className="text-sm font-medium text-gray-900">
+											{project.settings.duration}s
+										</span>
+									</div>
+								)}
+
+								<div className="flex items-center justify-between">
+									<span className="text-sm text-gray-500">Credits Used</span>
+									<span className="text-sm font-medium text-gray-900">
+										{project.creditsUsed || project.estimatedCredits || 0}{" "}
+										credits
+									</span>
+								</div>
+
+								<div className="border-t border-gray-100 pt-4">
+									<div className="flex items-center justify-between mb-2">
+										<span className="text-sm text-gray-500">Created</span>
+										<span className="text-sm text-gray-900">
+											{formatDate(project.createdAt)}
+										</span>
+									</div>
+									{project.completedAt && (
+										<div className="flex items-center justify-between">
+											<span className="text-sm text-gray-500">Completed</span>
+											<span className="text-sm text-gray-900">
+												{formatDate(project.completedAt)}
+											</span>
+										</div>
+									)}
+								</div>
+							</Card.Body>
+						</Card>
+
+						{/* Video File Info */}
+						{project.status === "completed" && project.video && (
+							<Card>
+								<Card.Header>
+									<h3 className="font-semibold text-gray-900">Video File</h3>
+								</Card.Header>
+								<Card.Body className="space-y-3">
+									<div className="flex items-center justify-between">
+										<span className="text-sm text-gray-500">Format</span>
+										<span className="text-sm font-medium text-gray-900 uppercase">
+											{project.video.format || "mp4"}
+										</span>
+									</div>
+									{project.video.width && project.video.height && (
+										<div className="flex items-center justify-between">
+											<span className="text-sm text-gray-500">Resolution</span>
+											<span className="text-sm font-medium text-gray-900">
+												{project.video.width}x{project.video.height}
+											</span>
+										</div>
+									)}
+									{project.video.size && (
+										<div className="flex items-center justify-between">
+											<span className="text-sm text-gray-500">File Size</span>
+											<span className="text-sm font-medium text-gray-900">
+												{formatFileSize(project.video.size)}
+											</span>
+										</div>
+									)}
+								</Card.Body>
+								<Card.Footer>
+									<div className="flex gap-2">
+										<button
+											onClick={() => handleDownload("mp4")}
+											className="btn-primary btn-sm flex-1"
+										>
+											<HiDownload className="w-4 h-4" />
+											MP4
+										</button>
+									</div>
+								</Card.Footer>
+							</Card>
+						)}
+
+						{/* Source URL */}
+						{project.sourceUrl && (
+							<Card>
+								<Card.Header>
+									<div className="flex items-center gap-2">
+										<HiLink className="w-5 h-5 text-gray-500" />
+										<h3 className="font-semibold text-gray-900">Source URL</h3>
+									</div>
+								</Card.Header>
+								<Card.Body>
+									<div className="flex items-center gap-2">
+										<input
+											type="text"
+											value={project.sourceUrl}
+											readOnly
+											className="input text-xs truncate"
+										/>
+										<button
+											onClick={() => {
+												navigator.clipboard.writeText(project.sourceUrl);
+												toast.success("URL copied!");
+											}}
+											className="btn-ghost btn-sm flex-shrink-0"
+										>
+											<HiDuplicate className="w-4 h-4" />
+										</button>
+									</div>
+								</Card.Body>
+							</Card>
+						)}
+
+						{/* Actions */}
+						<Card>
+							<Card.Body className="space-y-2">
+								<button
+									onClick={handleDuplicate}
+									disabled={actionLoading}
+									className="btn-ghost btn-md w-full justify-start"
+								>
+									<HiDuplicate className="w-4 h-4" />
+									Duplicate Project
+								</button>
+								<button
+									onClick={() => setShowEditModal(true)}
+									disabled={!["draft", "failed"].includes(project.status)}
+									className="btn-ghost btn-md w-full justify-start disabled:opacity-50"
+								>
+									<HiPencil className="w-4 h-4" />
+									Edit Settings
+								</button>
+								<button
+									onClick={() => setShowDeleteModal(true)}
+									className="btn-ghost btn-md w-full justify-start text-error-600 hover:bg-error-50"
+								>
+									<HiTrash className="w-4 h-4" />
+									Delete Project
+								</button>
+							</Card.Body>
+						</Card>
+					</div>
+				</div>
+			</div>
+
+			{/* Delete Confirmation Modal */}
+			<Modal
+				isOpen={showDeleteModal}
+				onClose={() => setShowDeleteModal(false)}
+				title="Delete Project"
+				size="sm"
+			>
+				<div className="p-6">
+					<div className="flex items-center justify-center w-12 h-12 bg-error-100 rounded-full mx-auto mb-4">
+						<HiTrash className="w-6 h-6 text-error-600" />
+					</div>
+					<h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+						Delete "{project.title}"?
+					</h3>
+					<p className="text-sm text-gray-500 text-center mb-6">
+						This action cannot be undone. The video and all associated data will
+						be permanently deleted.
+					</p>
+					<div className="flex gap-3">
+						<button
+							onClick={() => setShowDeleteModal(false)}
+							className="btn-secondary btn-md flex-1"
+						>
+							Cancel
+						</button>
+						<button
+							onClick={handleDelete}
+							disabled={actionLoading}
+							className="btn-danger btn-md flex-1"
+						>
+							{actionLoading ? "Deleting..." : "Delete"}
+						</button>
+					</div>
+				</div>
+			</Modal>
+
+			{/* Share Modal */}
+			<Modal
+				isOpen={showShareModal}
+				onClose={() => setShowShareModal(false)}
+				title="Share Video"
+			>
+				<div className="p-6">
+					<p className="text-sm text-gray-600 mb-4">
+						Share this video with a direct link. Anyone with the link can view
+						and download the video.
+					</p>
+					<div className="flex items-center gap-2 mb-6">
+						<input
+							type="text"
+							value={project.video?.url || ""}
+							readOnly
+							className="input"
+						/>
+						<button
+							onClick={handleCopyLink}
+							className="btn-primary btn-md flex-shrink-0"
+						>
+							<HiDuplicate className="w-4 h-4" />
+							Copy
+						</button>
+					</div>
+				</div>
+			</Modal>
+
+			{/* Edit Settings Modal */}
+			<EditSettingsModal
+				isOpen={showEditModal}
+				onClose={() => setShowEditModal(false)}
+				project={project}
+				onSave={handleEditSave}
+				loading={actionLoading}
+			/>
+		</>
+	);
+};
+
+export default ProjectDetailPage;

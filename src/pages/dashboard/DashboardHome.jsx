@@ -129,9 +129,9 @@ const DashboardHome = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-6xl font-black text-black tracking-tighter leading-none mb-4"
+              className="text-4xl md:text-5xl font-black text-black tracking-tighter leading-none mb-4 uppercase"
             >
-              Welcome back,<br /><span className="text-gray-400">{user?.name?.split(" ")[0] || "Agent"}</span>
+              Welcome back,<br /><span className="text-gray-300">{user?.name?.split(" ")[0] || "Agent"}</span>
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -191,7 +191,7 @@ const DashboardHome = () => {
         {/* Quick Actions */}
 				<motion.div variants={itemVariants} initial="hidden" animate="visible" className="lg:col-span-1 space-y-6">
           <div className="flex items-center gap-4 mb-2">
-            <h2 className="text-2xl font-bold tracking-tight">Quick Actions</h2>
+            <h2 className="text-xl font-black tracking-tight uppercase">Quick Actions</h2>
             <div className="h-[1px] bg-gray-200 flex-1" />
           </div>
 
@@ -231,7 +231,7 @@ const DashboardHome = () => {
         {/* Recent Projects List */}
         <motion.div variants={itemVariants} initial="hidden" animate="visible" className="lg:col-span-2">
            <div className="flex items-center justify-between gap-4 mb-8">
-            <h2 className="text-2xl font-bold tracking-tight">Recent Deployments</h2>
+            <h2 className="text-xl font-black tracking-tight uppercase">Recent Deployments</h2>
             <Link to="/dashboard/projects" className="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors">
               View Archive →
             </Link>
