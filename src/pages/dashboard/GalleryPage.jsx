@@ -1,943 +1,570 @@
-// client/src/pages/dashboard/GalleryPage.jsx
-import {useState, useEffect} from "react";
-import {Link} from "react-router-dom";
-import {Helmet} from "react-helmet-async";
-import {motion, AnimatePresence} from "framer-motion";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-	HiSearch,
-	HiFilter,
-	HiViewGrid,
-	HiViewList,
-	HiDownload,
-	HiPlay,
-	HiDotsVertical,
-	HiTrash,
-	HiShare,
-	HiExternalLink,
-	HiVideoCamera,
-	HiCheck,
-	HiX,
-	HiSortDescending,
-	HiFolder,
-	HiHeart,
-	HiRefresh,
+  HiSearch, HiFilter, HiViewGrid, HiViewList, HiDownload,
+  HiPlay, HiDotsVertical, HiTrash, HiExternalLink, HiVideoCamera,
+  HiCheck, HiX, HiSortDescending, HiFolder, HiHeart, HiRefresh,
+  HiSparkles, HiArrowRight, HiCube, HiClock
 } from "react-icons/hi";
-import {cn} from "@utils/cn";
-import {
-	formatDate,
-	formatRelativeTime,
-	formatDuration,
-	formatFileSize,
-} from "@utils/formatters";
-import {VIDEO_TEMPLATES} from "@utils/constants";
-import PageHeader from "@components/ui/PageHeader";
-import Card from "@components/ui/Card";
-import Badge from "@components/ui/Badge";
-import Modal from "@components/ui/Modal";
-import EmptyState from "@components/ui/EmptyState";
-import Skeleton from "@components/ui/Skeleton";
+import { cn } from "@utils/cn";
+import toast from "react-hot-toast";
+
+// Custom UI Components matching the new design system
+const AnimatedLine = ({ className = "" }) => (
+  <div className={`h-[1px] bg-gray-200 overflow-hidden ${className}`}>
+    <motion.div
+      className="w-1/3 h-full bg-yellow-400"
+      animate={{ x: ["-100%", "300%"] }}
+      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+    />
+  </div>
+);
+
+const Button = ({ children, className = "", variant = "primary", ...props }) => {
+  const variants = {
+    primary: "bg-black text-white hover:bg-yellow-400 hover:text-black shadow-xl hover:-translate-y-0.5 transition-all duration-300 font-bold disabled:opacity-50",
+    secondary: "bg-white border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 text-black font-bold",
+    ghost: "bg-gray-50 hover:bg-gray-100 text-gray-500 hover:text-black transition-all",
+    black: "bg-black text-white hover:bg-black/90 transition-all font-bold",
+    danger: "bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-all font-bold",
+    outline: "border-2 border-black text-black hover:bg-black hover:text-white transition-all font-bold"
+  };
+  return (
+    <button className={cn("px-6 py-3 flex items-center justify-center gap-3 uppercase text-[10px] tracking-[0.2em]", variants[variant], className)} {...props}>
+      {children}
+    </button>
+  );
+};
+
+const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
+  if (!isOpen) return null;
+  const sizes = { sm: "max-w-md", md: "max-w-2xl", lg: "max-w-4xl", xl: "max-w-6xl" };
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={onClose}>
+      <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className={cn("bg-white w-full shadow-2xl relative overflow-hidden", sizes[size])} onClick={(e) => e.stopPropagation()}>
+        <div className="p-8 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="text-xl font-black text-black tracking-tighter uppercase italic">{title}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-black"><HiX className="w-6 h-6" /></button>
+        </div>
+        <div className="p-8">{children}</div>
+        <AnimatedLine className="absolute bottom-0 left-0 right-0" />
+      </motion.div>
+    </div>
+  );
+};
+
+// Format utilities
+const formatDuration = (seconds) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
+const formatFileSize = (bytes) => {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  if (bytes === 0) return '0 Bytes';
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i];
+};
+
+const formatRelativeTime = (dateString) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+};
 
 // Mock data
 const mockVideos = [
-	{
-		id: "vid_1",
-		title: "Luxury Beachfront Villa",
-		thumbnail:
-			"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400",
-		videoUrl:
-			"https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
-		duration: 12,
-		template: "cinematic",
-		quality: "1080p",
-		aspectRatio: "16:9",
-		size: 45678900,
-		createdAt: "2024-01-15T10:30:00Z",
-		isFavorite: true,
-		downloads: 5,
-	},
-	{
-		id: "vid_2",
-		title: "Modern City Apartment",
-		thumbnail:
-			"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400",
-		videoUrl:
-			"https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
-		duration: 8,
-		template: "dynamic",
-		quality: "1080p",
-		aspectRatio: "16:9",
-		size: 32456000,
-		createdAt: "2024-01-14T15:20:00Z",
-		isFavorite: false,
-		downloads: 2,
-	},
-	{
-		id: "vid_3",
-		title: "Cozy Suburban Home",
-		thumbnail:
-			"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400",
-		videoUrl:
-			"https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
-		duration: 15,
-		template: "showcase",
-		quality: "4k",
-		aspectRatio: "16:9",
-		size: 89123000,
-		createdAt: "2024-01-13T09:15:00Z",
-		isFavorite: true,
-		downloads: 8,
-	},
-	{
-		id: "vid_4",
-		title: "Penthouse with Ocean View",
-		thumbnail:
-			"https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400",
-		videoUrl:
-			"https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
-		duration: 10,
-		template: "elegant",
-		quality: "1080p",
-		aspectRatio: "9:16",
-		size: 41567000,
-		createdAt: "2024-01-12T14:45:00Z",
-		isFavorite: false,
-		downloads: 3,
-	},
-	{
-		id: "vid_5",
-		title: "Historic Colonial Estate",
-		thumbnail:
-			"https://images.unsplash.com/photo-1600573472591-ee6c563aaec5?w=400",
-		videoUrl:
-			"https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
-		duration: 20,
-		template: "aerial",
-		quality: "4k",
-		aspectRatio: "16:9",
-		size: 125678000,
-		createdAt: "2024-01-11T11:30:00Z",
-		isFavorite: false,
-		downloads: 12,
-	},
-	{
-		id: "vid_6",
-		title: "Contemporary Loft Space",
-		thumbnail:
-			"https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=400",
-		videoUrl:
-			"https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
-		duration: 8,
-		template: "cinematic",
-		quality: "720p",
-		aspectRatio: "1:1",
-		size: 28456000,
-		createdAt: "2024-01-10T16:20:00Z",
-		isFavorite: true,
-		downloads: 1,
-	},
+  {
+    id: "vid_1",
+    title: "Luxury Beachfront Villa",
+    thumbnail: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&auto=format&fit=crop",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    duration: 12,
+    template: "cinematic",
+    quality: "1080p",
+    aspectRatio: "16:9",
+    size: 45678900,
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    isFavorite: true,
+    downloads: 5,
+  },
+  {
+    id: "vid_2",
+    title: "Modern City Apartment",
+    thumbnail: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&auto=format&fit=crop",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    duration: 8,
+    template: "dynamic",
+    quality: "1080p",
+    aspectRatio: "16:9",
+    size: 32456000,
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    isFavorite: false,
+    downloads: 2,
+  },
+  {
+    id: "vid_3",
+    title: "Cozy Suburban Home",
+    thumbnail: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&auto=format&fit=crop",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    duration: 15,
+    template: "elegant",
+    quality: "4k",
+    aspectRatio: "16:9",
+    size: 89123000,
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    isFavorite: true,
+    downloads: 8,
+  },
+  {
+    id: "vid_4",
+    title: "Penthouse with Ocean View",
+    thumbnail: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&auto=format&fit=crop",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    duration: 10,
+    template: "property",
+    quality: "1080p",
+    aspectRatio: "9:16",
+    size: 41567000,
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    isFavorite: false,
+    downloads: 3,
+  },
+  {
+    id: "vid_5",
+    title: "Historic Colonial Estate",
+    thumbnail: "https://images.unsplash.com/photo-1600573472591-ee6c563aaec5?w=400&auto=format&fit=crop",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    duration: 20,
+    template: "aerial",
+    quality: "4k",
+    aspectRatio: "16:9",
+    size: 125678000,
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    isFavorite: false,
+    downloads: 12,
+  },
+  {
+    id: "vid_6",
+    title: "Contemporary Loft Space",
+    thumbnail: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=400&auto=format&fit=crop",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    duration: 8,
+    template: "cinematic",
+    quality: "720p",
+    aspectRatio: "1:1",
+    size: 28456000,
+    createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+    isFavorite: true,
+    downloads: 1,
+  },
 ];
 
-const filterOptions = {
-	templates: [
-		{id: "all", label: "All Templates"},
-		...VIDEO_TEMPLATES.map((t) => ({id: t.id, label: t.name})),
-	],
-	quality: [
-		{id: "all", label: "All Qualities"},
-		{id: "720p", label: "720p HD"},
-		{id: "1080p", label: "1080p Full HD"},
-		{id: "4k", label: "4K Ultra HD"},
-	],
-	sortBy: [
-		{id: "newest", label: "Newest First"},
-		{id: "oldest", label: "Oldest First"},
-		{id: "name", label: "Name (A-Z)"},
-		{id: "size", label: "File Size"},
-	],
+const VideoCard = ({ video, viewMode, onPlay, onDownload, onDelete, onToggleFavorite, isSelected, onSelect }) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  if (viewMode === "list") {
+    return (
+      <div className={cn("group bg-white border border-gray-100 p-4 transition-all duration-300 relative", isSelected ? "bg-yellow-50" : "hover:shadow-xl hover:z-10")}>
+        <div className="flex items-center gap-6">
+          <input type="checkbox" checked={isSelected} onChange={() => onSelect(video.id)} className="w-5 h-5 accent-black rounded-none cursor-pointer" />
+          <div className="relative w-40 h-24 flex-shrink-0 cursor-pointer group/thumb" onClick={() => onPlay(video)}>
+            <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+              <HiPlay className="w-10 h-10 text-white" />
+            </div>
+            <div className="absolute bottom-1 right-1 px-2 py-0.5 bg-black text-white text-[10px] font-black uppercase tracking-widest">{formatDuration(video.duration)}</div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3">
+              <h3 className="font-black text-black tracking-tight uppercase truncate italic">{video.title}</h3>
+              {video.isFavorite && <HiHeart className="w-4 h-4 text-yellow-400" />}
+            </div>
+            <div className="flex items-center gap-4 mt-2">
+              <span className="bg-black text-white px-2 py-0.5 text-[8px] font-black uppercase tracking-widest leading-none">{video.template}</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{video.quality} • {video.aspectRatio}</span>
+            </div>
+          </div>
+          <div className="hidden md:flex flex-col items-end gap-1">
+             <span className="text-xs font-black text-black">{formatFileSize(video.size)}</span>
+             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{formatRelativeTime(video.createdAt)}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => onDownload(video)} className="p-3 bg-gray-50 hover:bg-black hover:text-white transition-all"><HiDownload className="w-5 h-5" /></button>
+            <button onClick={() => onToggleFavorite(video.id)} className={cn("p-3 transition-all", video.isFavorite ? "bg-yellow-400 text-black" : "bg-gray-50 hover:bg-yellow-100")}><HiHeart className="w-5 h-5" /></button>
+            <div className="relative">
+              <button onClick={() => setShowMenu(!showMenu)} className="p-3 bg-gray-50 hover:bg-black hover:text-white transition-all"><HiDotsVertical className="w-5 h-5" /></button>
+              <AnimatePresence>
+                {showMenu && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute right-0 top-full mt-2 bg-black text-white w-48 shadow-2xl z-[60]">
+                    <Link to={`/dashboard/projects/${video.id}`} className="block px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-colors">Operational View</Link>
+                    <button onClick={() => { onDownload(video); setShowMenu(false); }} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-colors">Acquire Assets</button>
+                    <button onClick={() => { onDelete(video); setShowMenu(false); }} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest bg-red-900/50 hover:bg-red-600 transition-colors">Decommission</button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+        <AnimatedLine className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className={cn(
+        "group bg-white border border-gray-100 relative overflow-hidden transition-all duration-300",
+        isSelected ? "p-2 bg-yellow-400" : "hover:shadow-2xl hover:-translate-y-1"
+      )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => { setIsHovered(false); setShowMenu(false); }}
+    >
+      <div className="relative aspect-video bg-black cursor-pointer overflow-hidden" onClick={() => onPlay(video)}>
+        <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100" />
+        <div className={cn("absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300", isHovered ? "opacity-100" : "opacity-0")}>
+           <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center shadow-2xl scale-0 group-hover:scale-100 transition-transform duration-500">
+             <HiPlay className="w-8 h-8 text-black ml-1" />
+           </div>
+        </div>
+        <div className="absolute top-4 left-4 flex gap-2">
+           <input type="checkbox" checked={isSelected} onClick={(e) => e.stopPropagation()} onChange={() => onSelect(video.id)} className="w-5 h-5 accent-black rounded-none cursor-pointer" />
+           <span className="bg-black text-white px-2 py-0.5 text-[8px] font-black uppercase tracking-widest">{video.quality}</span>
+        </div>
+        <div className="absolute bottom-4 right-4 bg-black text-white px-2 py-1 text-[10px] font-black tracking-widest">{formatDuration(video.duration)}</div>
+        {video.isFavorite && <div className="absolute top-4 right-4 text-yellow-400"><HiHeart className="w-5 h-5" /></div>}
+      </div>
+      
+      <div className="p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h3 className="text-lg font-black tracking-tighter uppercase italic text-black leading-tight truncate">{video.title}</h3>
+            <div className="flex items-center gap-3 mt-2">
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{video.template}</span>
+              <div className="w-1 h-1 bg-gray-200 rounded-full" />
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{formatRelativeTime(video.createdAt)}</span>
+            </div>
+          </div>
+          <div className="relative">
+             <button onClick={() => setShowMenu(!showMenu)} className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 transition-all"><HiDotsVertical className="w-5 h-5" /></button>
+             <AnimatePresence>
+                {showMenu && (
+                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="absolute right-0 bottom-full mb-2 bg-black text-white w-48 shadow-2xl z-50 overflow-hidden">
+                    <Link to={`/dashboard/projects/${video.id}`} className="block px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-colors">Details</Link>
+                    <button onClick={() => onDownload(video)} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-colors">Download</button>
+                    <button onClick={() => onDelete(video)} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest bg-red-900/50 hover:bg-red-600 transition-colors">Decommission</button>
+                  </motion.div>
+                )}
+             </AnimatePresence>
+          </div>
+        </div>
+      </div>
+      <AnimatedLine className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+    </div>
+  );
 };
 
-// Video Card Component
-const VideoCard = ({
-	video,
-	viewMode,
-	onPlay,
-	onDownload,
-	onDelete,
-	onToggleFavorite,
-	isSelected,
-	onSelect,
-}) => {
-	const [showMenu, setShowMenu] = useState(false);
-	const [isHovered, setIsHovered] = useState(false);
-	const template = VIDEO_TEMPLATES.find((t) => t.id === video.template);
+export default function GalleryPage() {
+  const [videos, setVideos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [viewMode, setViewMode] = useState("grid");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({ template: "all", quality: "all", showFavoritesOnly: false });
+  const [sortBy, setSortBy] = useState("newest");
+  const [selectedVideos, setSelectedVideos] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [videoToDelete, setVideoToDelete] = useState(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [activeVideo, setActiveVideo] = useState(null);
 
-	if (viewMode === "list") {
-		return (
-			<motion.div
-				layout
-				initial={{opacity: 0, y: 20}}
-				animate={{opacity: 1, y: 0}}
-				exit={{opacity: 0, y: -20}}
-				className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-card-hover transition-shadow"
-			>
-				<input
-					type="checkbox"
-					checked={isSelected}
-					onChange={() => onSelect(video.id)}
-					className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-				/>
+  useEffect(() => {
+    setTimeout(() => {
+      setVideos(mockVideos);
+      setIsLoading(false);
+    }, 800);
+  }, []);
 
-				<div
-					className="relative w-32 h-20 flex-shrink-0 rounded-lg overflow-hidden cursor-pointer group"
-					onClick={() => onPlay(video)}
-				>
-					<img
-						src={video.thumbnail}
-						alt={video.title}
-						className="w-full h-full object-cover"
-					/>
-					<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-						<HiPlay className="w-8 h-8 text-white" />
-					</div>
-					<div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/70 rounded text-xs text-white">
-						{formatDuration(video.duration)}
-					</div>
-				</div>
+  const filteredVideos = videos
+    .filter((video) => {
+      if (searchQuery && !video.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      if (filters.template !== "all" && video.template !== filters.template) return false;
+      if (filters.quality !== "all" && video.quality !== filters.quality) return false;
+      if (filters.showFavoritesOnly && !video.isFavorite) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "oldest": return new Date(a.createdAt) - new Date(b.createdAt);
+        case "name": return a.title.localeCompare(b.title);
+        case "size": return b.size - a.size;
+        default: return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+    });
 
-				<div className="flex-1 min-w-0">
-					<div className="flex items-center gap-2">
-						<h3 className="font-medium text-gray-900 truncate">
-							{video.title}
-						</h3>
-						{video.isFavorite && (
-							<HiHeart className="w-4 h-4 text-error-500 flex-shrink-0" />
-						)}
-					</div>
-					<div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
-						<span className="flex items-center gap-1">
-							<span>{template?.icon}</span>
-							{template?.name}
-						</span>
-						<span>{video.quality}</span>
-					</div>
-				</div>
+  const handleSelectVideo = (videoId) => {
+    setSelectedVideos(prev => prev.includes(videoId) ? prev.filter(id => id !== videoId) : [...prev, videoId]);
+  };
 
-				<div className="flex items-center gap-6 text-sm text-gray-500">
-					<div className="text-right">
-						<div className="text-gray-900 font-medium">
-							{formatFileSize(video.size)}
-						</div>
-						<div>{formatRelativeTime(video.createdAt)}</div>
-					</div>
-				</div>
+  const handleSelectAll = () => {
+    if (selectedVideos.length === filteredVideos.length) {
+      setSelectedVideos([]);
+    } else {
+      setSelectedVideos(filteredVideos.map(v => v.id));
+    }
+  };
 
-				<div className="flex items-center gap-1">
-					<button
-						onClick={() => onDownload(video)}
-						className="btn-ghost btn-sm"
-					>
-						<HiDownload className="w-4 h-4" />
-					</button>
-					<button
-						onClick={() => onToggleFavorite(video.id)}
-						className={cn(
-							"btn-ghost btn-sm",
-							video.isFavorite && "text-error-500"
-						)}
-					>
-						<HiHeart className="w-4 h-4" />
-					</button>
-					<div className="relative">
-						<button
-							onClick={() => setShowMenu(!showMenu)}
-							className="btn-ghost btn-sm"
-						>
-							<HiDotsVertical className="w-4 h-4" />
-						</button>
-						{showMenu && (
-							<>
-								<div
-									className="fixed inset-0 z-40"
-									onClick={() => setShowMenu(false)}
-								/>
-								<div className="dropdown-menu right-0 top-full mt-1">
-									<Link
-										to={`/dashboard/projects/${video.id}`}
-										className="dropdown-item"
-									>
-										<HiExternalLink className="w-4 h-4" />
-										View Details
-									</Link>
-									<button className="dropdown-item">
-										<HiShare className="w-4 h-4" />
-										Share
-									</button>
-									<div className="dropdown-divider" />
-									<button
-										onClick={() => onDelete(video)}
-										className="dropdown-item-danger"
-									>
-										<HiTrash className="w-4 h-4" />
-										Delete
-									</button>
-								</div>
-							</>
-						)}
-					</div>
-				</div>
-			</motion.div>
-		);
-	}
+  const handlePlayVideo = (video) => {
+    setActiveVideo(video);
+    setShowVideoModal(true);
+  };
 
-	// Grid view
-	return (
-		<motion.div
-			layout
-			initial={{opacity: 0, scale: 0.95}}
-			animate={{opacity: 1, scale: 1}}
-			exit={{opacity: 0, scale: 0.95}}
-			className="group"
-			onMouseEnter={() => setIsHovered(true)}
-			onMouseLeave={() => {
-				setIsHovered(false);
-				setShowMenu(false);
-			}}
-		>
-			<Card className="overflow-hidden hover:shadow-card-hover transition-shadow">
-				<div
-					className="relative aspect-video cursor-pointer"
-					onClick={() => onPlay(video)}
-				>
-					<img
-						src={video.thumbnail}
-						alt={video.title}
-						className="w-full h-full object-cover"
-					/>
+  const handleDownload = (video) => {
+    toast.success(`Exporting sequence: ${video.title}`);
+  };
 
-					<div
-						className={cn(
-							"absolute inset-0 bg-black/40 transition-opacity flex items-center justify-center",
-							isHovered ? "opacity-100" : "opacity-0"
-						)}
-					>
-						<div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center">
-							<HiPlay className="w-7 h-7 text-gray-900 ml-1" />
-						</div>
-					</div>
+  const handleDelete = (video) => {
+    setVideoToDelete(video);
+    setShowDeleteModal(true);
+  };
 
-					<div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 rounded-md text-xs text-white font-medium">
-						{formatDuration(video.duration)}
-					</div>
+  const confirmDelete = async () => {
+    setVideos(prev => prev.filter(v => v.id !== videoToDelete.id));
+    setShowDeleteModal(false);
+    setVideoToDelete(null);
+    toast.success("Asset decommissioned");
+  };
 
-					{video.isFavorite && (
-						<div className="absolute top-2 right-2">
-							<HiHeart className="w-5 h-5 text-error-500 drop-shadow-md" />
-						</div>
-					)}
+  const handleToggleFavorite = (videoId) => {
+    setVideos(prev => prev.map(v => v.id === videoId ? { ...v, isFavorite: !v.isFavorite } : v));
+  };
 
-					<div
-						className={cn(
-							"absolute top-2 left-2 transition-opacity",
-							isHovered || isSelected ? "opacity-100" : "opacity-0"
-						)}
-					>
-						<input
-							type="checkbox"
-							checked={isSelected}
-							onChange={(e) => {
-								e.stopPropagation();
-								onSelect(video.id);
-							}}
-							className="w-5 h-5 text-primary-600 border-2 border-white rounded focus:ring-primary-500 bg-white/80"
-						/>
-					</div>
+  const clearFilters = () => {
+    setFilters({ template: "all", quality: "all", showFavoritesOnly: false });
+    setSearchQuery("");
+  };
 
-					<div className="absolute top-2 left-10">
-						<Badge variant={video.quality === "4k" ? "primary" : "gray"}>
-							{video.quality}
-						</Badge>
-					</div>
-				</div>
+  const stats = {
+    total: videos.length,
+    favorites: videos.filter(v => v.isFavorite).length,
+    totalSize: videos.reduce((acc, v) => acc + v.size, 0),
+  };
 
-				<div className="p-4">
-					<div className="flex items-start justify-between gap-2">
-						<div className="min-w-0">
-							<h3 className="font-medium text-gray-900 truncate">
-								{video.title}
-							</h3>
-							<div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-								<span className="flex items-center gap-1">
-									<span>{template?.icon}</span>
-									{template?.name}
-								</span>
-								<span>•</span>
-								<span>{video.aspectRatio}</span>
-							</div>
-						</div>
+  return (
+    <div className="min-h-screen bg-[#f9f9f7] text-black font-['Plus_Jakarta_Sans',sans-serif] p-6 lg:p-12">
+      <Helmet><title>Asset Archive - VideoGen AI</title></Helmet>
+      
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 pb-12 border-b border-gray-200">
+           <div>
+              <div className="flex items-center gap-4 mb-4">
+                 <span className="bg-black text-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]">Asset Archive</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 italic font-medium">Repository Control</span>
+              </div>
+              <h1 className="text-4xl md:text-6xl font-black text-black tracking-tighter uppercase italic leading-none">
+                Deployment <br />Gallery
+              </h1>
+           </div>
+           
+           <div className="flex flex-wrap items-center gap-8">
+              <div className="flex flex-col gap-1">
+                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total sequences</span>
+                 <span className="text-2xl font-black tracking-tight italic">{stats.total}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Storage used</span>
+                 <span className="text-2xl font-black tracking-tight italic">{formatFileSize(stats.totalSize)}</span>
+              </div>
+              <Link to="/dashboard/projects/new">
+                <Button className="h-16 px-10">Initialize New Project <HiArrowRight className="w-5 h-5" /></Button>
+              </Link>
+           </div>
+        </div>
 
-						<div className="relative">
-							<button
-								onClick={() => setShowMenu(!showMenu)}
-								className="btn-ghost btn-sm -mr-2"
-							>
-								<HiDotsVertical className="w-4 h-4" />
-							</button>
-							{showMenu && (
-								<>
-									<div
-										className="fixed inset-0 z-40"
-										onClick={() => setShowMenu(false)}
-									/>
-									<div className="dropdown-menu right-0 top-full mt-1">
-										<Link
-											to={`/dashboard/projects/${video.id}`}
-											className="dropdown-item"
-										>
-											<HiExternalLink className="w-4 h-4" />
-											View Details
-										</Link>
-										<button
-											onClick={() => onDownload(video)}
-											className="dropdown-item"
-										>
-											<HiDownload className="w-4 h-4" />
-											Download
-										</button>
-										<button
-											onClick={() => onToggleFavorite(video.id)}
-											className="dropdown-item"
-										>
-											<HiHeart className="w-4 h-4" />
-											{video.isFavorite ? "Remove Favorite" : "Add Favorite"}
-										</button>
-										<div className="dropdown-divider" />
-										<button
-											onClick={() => onDelete(video)}
-											className="dropdown-item-danger"
-										>
-											<HiTrash className="w-4 h-4" />
-											Delete
-										</button>
-									</div>
-								</>
-							)}
-						</div>
-					</div>
+        {/* Toolbar - Bento Style */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-12">
+          {/* Search Box */}
+          <div className="lg:col-span-2 relative group bg-white border border-gray-100 p-2 flex items-center shadow-sm focus-within:border-yellow-400 transition-colors">
+            <HiSearch className="w-6 h-6 text-gray-300 ml-4" />
+            <input 
+              type="text" 
+              placeholder="Search by mission title..." 
+              value={searchQuery} 
+              onChange={(e) => setSearchQuery(e.target.value)} 
+              className="flex-1 bg-transparent p-4 outline-none text-sm font-bold placeholder:text-gray-200"
+            />
+            <AnimatedLine className="absolute bottom-0 left-0 right-0 group-hover:opacity-100 opacity-0 transition-opacity" />
+          </div>
 
-					<div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 text-sm text-gray-500">
-						<span>{formatFileSize(video.size)}</span>
-						<span>{formatRelativeTime(video.createdAt)}</span>
-					</div>
-				</div>
-			</Card>
-		</motion.div>
-	);
-};
+          {/* Quick Filters */}
+          <div className="flex bg-white border border-gray-100 p-2 shadow-sm">
+             <button onClick={() => setViewMode("grid")} className={cn("flex-1 flex items-center justify-center p-3 gap-2 transition-all", viewMode === "grid" ? "bg-black text-white" : "hover:bg-gray-50 text-gray-400")}>
+               <HiViewGrid className="w-5 h-5" />
+             </button>
+             <button onClick={() => setViewMode("list")} className={cn("flex-1 flex items-center justify-center p-3 gap-2 transition-all", viewMode === "list" ? "bg-black text-white" : "hover:bg-gray-50 text-gray-400")}>
+               <HiViewList className="w-5 h-5" />
+             </button>
+          </div>
 
-// Main Component
-const GalleryPage = () => {
-	const [videos, setVideos] = useState([]);
-	const [isLoading, setIsLoading] = useState(true);
-	const [viewMode, setViewMode] = useState("grid");
-	const [searchQuery, setSearchQuery] = useState("");
-	const [showFilters, setShowFilters] = useState(false);
-	const [filters, setFilters] = useState({
-		template: "all",
-		quality: "all",
-		showFavoritesOnly: false,
-	});
-	const [sortBy, setSortBy] = useState("newest");
-	const [selectedVideos, setSelectedVideos] = useState([]);
-	const [showDeleteModal, setShowDeleteModal] = useState(false);
-	const [videoToDelete, setVideoToDelete] = useState(null);
-	const [showVideoModal, setShowVideoModal] = useState(false);
-	const [activeVideo, setActiveVideo] = useState(null);
+          {/* Filter Toggle */}
+          <button onClick={() => setShowFilters(!showFilters)} className={cn("border-2 border-black flex items-center justify-center gap-4 py-4 px-6 uppercase text-[10px] font-black tracking-widest transition-all", showFilters ? "bg-black text-white" : "hover:bg-black hover:text-white")}>
+            <HiFilter className="w-5 h-5" /> {showFilters ? "Close Filters" : "Operational Settings"}
+          </button>
+        </div>
 
-	useEffect(() => {
-		const fetchVideos = async () => {
-			setIsLoading(true);
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-			setVideos(mockVideos);
-			setIsLoading(false);
-		};
-		fetchVideos();
-	}, []);
+        {/* Extended Filters */}
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="mb-12 bg-black text-white p-8 relative overflow-hidden">
+               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                  <div className="space-y-3">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-white/40 flex items-center gap-2"><HiCube className="w-3 h-3" /> Template Type</label>
+                     <select value={filters.template} onChange={(e) => setFilters(prev => ({ ...prev, template: e.target.value }))} className="w-full bg-white/5 border border-white/10 p-4 outline-none focus:border-yellow-400 font-bold text-sm appearance-none">
+                        <option value="all">Archival Default</option>
+                        <option value="cinematic">Cinematic</option><option value="dynamic">Dynamic</option>
+                        <option value="elegant">Elegant</option><option value="property">Property</option>
+                     </select>
+                  </div>
+                  <div className="space-y-3">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-white/40 flex items-center gap-2"><HiExternalLink className="w-3 h-3" /> Quality Scale</label>
+                     <select value={filters.quality} onChange={(e) => setFilters(prev => ({ ...prev, quality: e.target.value }))} className="w-full bg-white/5 border border-white/10 p-4 outline-none focus:border-yellow-400 font-bold text-sm appearance-none">
+                        <option value="all">All Resolutions</option>
+                        <option value="720p">720P HD</option><option value="1080p">1080P FHD</option>
+                        <option value="4k">4K UHD</option>
+                     </select>
+                  </div>
+                  <div className="space-y-3">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-white/40 flex items-center gap-2"><HiSortDescending className="w-3 h-3" /> Sequence Sort</label>
+                     <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 outline-none focus:border-yellow-400 font-bold text-sm appearance-none">
+                        <option value="newest">Recent Deployment</option>
+                        <option value="oldest">Legacy Archives</option>
+                        <option value="name">Alphanumeric (A-Z)</option>
+                        <option value="size">Size Projection</option>
+                     </select>
+                  </div>
+                  <div className="flex flex-col justify-end">
+                     <button onClick={clearFilters} className="w-full py-4 bg-yellow-400 text-black font-black uppercase text-[10px] tracking-widest hover:bg-white transition-colors">Reset Archive Parameters</button>
+                  </div>
+               </div>
+               <div className="mt-8 pt-8 border-t border-white/10 flex items-center gap-6">
+                  <button onClick={() => setFilters(prev => ({ ...prev, showFavoritesOnly: !prev.showFavoritesOnly }))} className={cn("flex items-center gap-3 px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all", filters.showFavoritesOnly ? "bg-yellow-400 text-black border-yellow-400" : "text-white/40 border-white/10 hover:border-white/40")}>
+                    <HiHeart className="w-4 h-4" /> Priority Assets Only
+                  </button>
+               </div>
+               <AnimatedLine className="absolute bottom-0 left-0 right-0" />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-	const filteredVideos = videos
-		.filter((video) => {
-			if (
-				searchQuery &&
-				!video.title.toLowerCase().includes(searchQuery.toLowerCase())
-			)
-				return false;
-			if (filters.template !== "all" && video.template !== filters.template)
-				return false;
-			if (filters.quality !== "all" && video.quality !== filters.quality)
-				return false;
-			if (filters.showFavoritesOnly && !video.isFavorite) return false;
-			return true;
-		})
-		.sort((a, b) => {
-			switch (sortBy) {
-				case "oldest":
-					return new Date(a.createdAt) - new Date(b.createdAt);
-				case "name":
-					return a.title.localeCompare(b.title);
-				case "size":
-					return b.size - a.size;
-				default:
-					return new Date(b.createdAt) - new Date(a.createdAt);
-			}
-		});
+        {/* Bulk Control Bar */}
+        <AnimatePresence>
+          {selectedVideos.length > 0 && (
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[100] w-full max-w-2xl px-6">
+              <div className="bg-black text-white p-6 shadow-[0_40px_100px_rgba(0,0,0,0.5)] flex items-center justify-between gap-8 border border-white/10 relative">
+                <div className="flex items-center gap-6">
+                  <div className="w-12 h-12 bg-yellow-400 text-black flex items-center justify-center font-black italic shadow-xl">{selectedVideos.length}</div>
+                  <div>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-white/40">Active Selection</h4>
+                    <button onClick={handleSelectAll} className="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-400 hover:text-white transition-colors">
+                      {selectedVideos.length === filteredVideos.length ? "Clear Archive Selection" : "Claim Remaining Assets"}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <button className="flex items-center gap-2 p-4 bg-white/5 hover:bg-white/10 transition-all text-xs font-black uppercase tracking-widest"><HiDownload /> Batch Export</button>
+                  <button className="flex items-center gap-2 p-4 bg-red-900/50 hover:bg-red-600 transition-all text-xs font-black uppercase tracking-widest"><HiTrash /> Decommission</button>
+                  <button onClick={() => setSelectedVideos([])} className="p-4 bg-white/5 hover:bg-white/10 transition-all"><HiX /></button>
+                </div>
+                <AnimatedLine className="absolute top-0 left-0 right-0" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-	const handleSelectVideo = (videoId) => {
-		setSelectedVideos((prev) =>
-			prev.includes(videoId)
-				? prev.filter((id) => id !== videoId)
-				: [...prev, videoId]
-		);
-	};
+        {/* Gallery Content */}
+        {isLoading ? (
+          <div className={cn(viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" : "space-y-6")}>
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white border border-gray-100 aspect-video animate-pulse" />
+            ))}
+          </div>
+        ) : filteredVideos.length === 0 ? (
+          <div className="bg-white border border-gray-100 p-32 text-center relative group">
+            <h3 className="text-4xl font-black tracking-tighter uppercase italic mb-4">No Archives Found</h3>
+            <p className="text-gray-400 font-medium mb-12">Deployment repository empty for current operational parameters.</p>
+            <Button onClick={clearFilters} variant="outline" className="mx-auto">Recalibrate Archive Filters</Button>
+            <AnimatedLine className="absolute bottom-0 left-0 right-0" />
+          </div>
+        ) : (
+          <div className={cn(viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-32" : "space-y-4 pb-32")}>
+            {filteredVideos.map((video) => (
+              <VideoCard key={video.id} video={video} viewMode={viewMode} onPlay={handlePlayVideo} onDownload={handleDownload} onDelete={handleDelete} onToggleFavorite={handleToggleFavorite} isSelected={selectedVideos.includes(video.id)} onSelect={handleSelectVideo} />
+            ))}
+          </div>
+        )}
+      </div>
 
-	const handleSelectAll = () => {
-		if (selectedVideos.length === filteredVideos.length) {
-			setSelectedVideos([]);
-		} else {
-			setSelectedVideos(filteredVideos.map((v) => v.id));
-		}
-	};
+      {/* Video Modal */}
+      <AnimatePresence>
+        {showVideoModal && (
+          <Modal isOpen={showVideoModal} onClose={() => { setShowVideoModal(false); setActiveVideo(null); }} size="xl" title={activeVideo?.title}>
+            <div className="space-y-8">
+               <div className="bg-black aspect-video relative group overflow-hidden">
+                  <video src={activeVideo?.videoUrl} poster={activeVideo?.thumbnail} controls autoPlay className="w-full h-full object-contain" />
+                  <div className="absolute top-6 right-6 flex items-center gap-3">
+                     <span className="bg-yellow-400 text-black px-3 py-1 text-[10px] font-black uppercase tracking-widest shadow-xl">Original asset</span>
+                  </div>
+               </div>
+               <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pt-4">
+                  <div className="flex gap-12">
+                     <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Configuration</span>
+                        <span className="text-lg font-black tracking-tighter uppercase italic">{activeVideo?.template}</span>
+                     </div>
+                     <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Resolution</span>
+                        <span className="text-lg font-black tracking-tighter uppercase italic">{activeVideo?.quality}</span>
+                     </div>
+                     <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Deployment</span>
+                        <span className="text-lg font-black tracking-tighter uppercase italic">{formatRelativeTime(activeVideo?.createdAt)}</span>
+                     </div>
+                  </div>
+                  <div className="flex gap-4">
+                     <Button variant="secondary" onClick={() => handleDownload(activeVideo)} className="flex-1"><HiDownload className="w-4 h-4" /> Download</Button>
+                     <Button className="flex-1">Share Mission Link <HiExternalLink className="w-4 h-4" /></Button>
+                  </div>
+               </div>
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
 
-	const handlePlayVideo = (video) => {
-		setActiveVideo(video);
-		setShowVideoModal(true);
-	};
-
-	const handleDownload = (video) => {
-		const link = document.createElement("a");
-		link.href = video.videoUrl;
-		link.download = `${video.title.replace(/\s+/g, "_")}.mp4`;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	};
-
-	const handleDelete = (video) => {
-		setVideoToDelete(video);
-		setShowDeleteModal(true);
-	};
-
-	const confirmDelete = async () => {
-		setVideos((prev) => prev.filter((v) => v.id !== videoToDelete.id));
-		setShowDeleteModal(false);
-		setVideoToDelete(null);
-	};
-
-	const handleToggleFavorite = (videoId) => {
-		setVideos((prev) =>
-			prev.map((v) =>
-				v.id === videoId ? {...v, isFavorite: !v.isFavorite} : v
-			)
-		);
-	};
-
-	const clearFilters = () => {
-		setFilters({template: "all", quality: "all", showFavoritesOnly: false});
-		setSearchQuery("");
-	};
-
-	const hasActiveFilters =
-		searchQuery ||
-		filters.template !== "all" ||
-		filters.quality !== "all" ||
-		filters.showFavoritesOnly;
-
-	const stats = {
-		total: videos.length,
-		favorites: videos.filter((v) => v.isFavorite).length,
-		totalSize: videos.reduce((acc, v) => acc + v.size, 0),
-	};
-
-	return (
-		<>
-			<Helmet>
-				<title>Video Gallery - VideoGen AI</title>
-			</Helmet>
-
-			<div className="p-6">
-				<PageHeader
-					title="Video Gallery"
-					subtitle="Browse and manage all your generated videos"
-					action={
-						<Link to="/dashboard/projects/new" className="btn-primary btn-md">
-							<HiVideoCamera className="w-4 h-4" />
-							Create New Video
-						</Link>
-					}
-				/>
-
-				{/* Stats */}
-				<div className="flex items-center gap-6 mb-6 text-sm">
-					<div className="flex items-center gap-2">
-						<HiVideoCamera className="w-4 h-4 text-gray-400" />
-						<span className="text-gray-600">{stats.total} videos</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<HiHeart className="w-4 h-4 text-error-400" />
-						<span className="text-gray-600">{stats.favorites} favorites</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<HiFolder className="w-4 h-4 text-gray-400" />
-						<span className="text-gray-600">
-							{formatFileSize(stats.totalSize)} total
-						</span>
-					</div>
-				</div>
-
-				{/* Toolbar */}
-				<div className="flex items-center justify-between gap-4 mb-6">
-					<div className="flex items-center gap-3 flex-1">
-						<div className="relative flex-1 max-w-md">
-							<HiSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-							<input
-								type="text"
-								placeholder="Search videos..."
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								className="input pl-10"
-							/>
-						</div>
-
-						<button
-							onClick={() => setShowFilters(!showFilters)}
-							className={cn(
-								"btn-secondary btn-md",
-								showFilters && "bg-gray-100"
-							)}
-						>
-							<HiFilter className="w-4 h-4" />
-							Filters
-							{hasActiveFilters && (
-								<span className="w-2 h-2 bg-primary-500 rounded-full" />
-							)}
-						</button>
-
-						<button
-							onClick={() =>
-								setFilters((prev) => ({
-									...prev,
-									showFavoritesOnly: !prev.showFavoritesOnly,
-								}))
-							}
-							className={cn(
-								"btn-secondary btn-md",
-								filters.showFavoritesOnly &&
-									"bg-error-50 border-error-200 text-error-600"
-							)}
-						>
-							<HiHeart className="w-4 h-4" />
-							Favorites
-						</button>
-					</div>
-
-					<div className="flex items-center gap-2">
-						<div className="relative">
-							<select
-								value={sortBy}
-								onChange={(e) => setSortBy(e.target.value)}
-								className="input pr-10 min-w-[160px]"
-							>
-								{filterOptions.sortBy.map((option) => (
-									<option key={option.id} value={option.id}>
-										{option.label}
-									</option>
-								))}
-							</select>
-							<HiSortDescending className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-						</div>
-
-						<div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-							<button
-								onClick={() => setViewMode("grid")}
-								className={cn(
-									"p-2 transition-colors",
-									viewMode === "grid"
-										? "bg-gray-100 text-gray-900"
-										: "text-gray-500 hover:text-gray-700"
-								)}
-							>
-								<HiViewGrid className="w-5 h-5" />
-							</button>
-							<button
-								onClick={() => setViewMode("list")}
-								className={cn(
-									"p-2 transition-colors",
-									viewMode === "list"
-										? "bg-gray-100 text-gray-900"
-										: "text-gray-500 hover:text-gray-700"
-								)}
-							>
-								<HiViewList className="w-5 h-5" />
-							</button>
-						</div>
-					</div>
-				</div>
-
-				{/* Filters Panel */}
-				<AnimatePresence>
-					{showFilters && (
-						<motion.div
-							initial={{opacity: 0, height: 0}}
-							animate={{opacity: 1, height: "auto"}}
-							exit={{opacity: 0, height: 0}}
-							className="overflow-hidden mb-6"
-						>
-							<Card>
-								<Card.Body className="flex items-center gap-4">
-									<select
-										value={filters.template}
-										onChange={(e) =>
-											setFilters((prev) => ({
-												...prev,
-												template: e.target.value,
-											}))
-										}
-										className="input max-w-[180px]"
-									>
-										{filterOptions.templates.map((option) => (
-											<option key={option.id} value={option.id}>
-												{option.label}
-											</option>
-										))}
-									</select>
-
-									<select
-										value={filters.quality}
-										onChange={(e) =>
-											setFilters((prev) => ({...prev, quality: e.target.value}))
-										}
-										className="input max-w-[180px]"
-									>
-										{filterOptions.quality.map((option) => (
-											<option key={option.id} value={option.id}>
-												{option.label}
-											</option>
-										))}
-									</select>
-
-									{hasActiveFilters && (
-										<button
-											onClick={clearFilters}
-											className="btn-ghost btn-sm text-gray-500"
-										>
-											<HiX className="w-4 h-4" />
-											Clear all
-										</button>
-									)}
-								</Card.Body>
-							</Card>
-						</motion.div>
-					)}
-				</AnimatePresence>
-
-				{/* Bulk Actions */}
-				<AnimatePresence>
-					{selectedVideos.length > 0 && (
-						<motion.div
-							initial={{opacity: 0, y: -10}}
-							animate={{opacity: 1, y: 0}}
-							exit={{opacity: 0, y: -10}}
-							className="mb-6"
-						>
-							<Card className="bg-primary-50 border-primary-100">
-								<Card.Body className="flex items-center justify-between py-3">
-									<div className="flex items-center gap-3">
-										<button
-											onClick={handleSelectAll}
-											className="btn-ghost btn-sm"
-										>
-											{selectedVideos.length === filteredVideos.length ? (
-												<>
-													<HiX className="w-4 h-4" /> Deselect all
-												</>
-											) : (
-												<>
-													<HiCheck className="w-4 h-4" /> Select all
-												</>
-											)}
-										</button>
-										<span className="text-sm text-primary-700 font-medium">
-											{selectedVideos.length} selected
-										</span>
-									</div>
-
-									<div className="flex items-center gap-2">
-										<button className="btn-secondary btn-sm">
-											<HiDownload className="w-4 h-4" />
-											Download All
-										</button>
-										<button className="btn-danger btn-sm">
-											<HiTrash className="w-4 h-4" />
-											Delete
-										</button>
-									</div>
-								</Card.Body>
-							</Card>
-						</motion.div>
-					)}
-				</AnimatePresence>
-
-				{/* Content */}
-				{isLoading ? (
-					<div
-						className={cn(
-							viewMode === "grid"
-								? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-								: "space-y-4"
-						)}
-					>
-						{[...Array(8)].map((_, i) => (
-							<Skeleton
-								key={i}
-								className={
-									viewMode === "grid"
-										? "aspect-[4/3] rounded-xl"
-										: "h-24 rounded-xl"
-								}
-							/>
-						))}
-					</div>
-				) : filteredVideos.length === 0 ? (
-					<EmptyState
-						icon={hasActiveFilters ? HiSearch : HiVideoCamera}
-						title={hasActiveFilters ? "No videos found" : "No videos yet"}
-						description={
-							hasActiveFilters
-								? "Try adjusting your filters"
-								: "Create your first video"
-						}
-						action={
-							hasActiveFilters ? (
-								<button onClick={clearFilters} className="btn-secondary btn-md">
-									<HiRefresh className="w-4 h-4" />
-									Clear Filters
-								</button>
-							) : (
-								<Link
-									to="/dashboard/projects/new"
-									className="btn-primary btn-md"
-								>
-									<HiVideoCamera className="w-4 h-4" />
-									Create Video
-								</Link>
-							)
-						}
-					/>
-				) : (
-					<motion.div
-						layout
-						className={cn(
-							viewMode === "grid"
-								? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-								: "space-y-4"
-						)}
-					>
-						<AnimatePresence mode="popLayout">
-							{filteredVideos.map((video) => (
-								<VideoCard
-									key={video.id}
-									video={video}
-									viewMode={viewMode}
-									onPlay={handlePlayVideo}
-									onDownload={handleDownload}
-									onDelete={handleDelete}
-									onToggleFavorite={handleToggleFavorite}
-									isSelected={selectedVideos.includes(video.id)}
-									onSelect={handleSelectVideo}
-								/>
-							))}
-						</AnimatePresence>
-					</motion.div>
-				)}
-			</div>
-
-			{/* Video Modal */}
-			<Modal
-				isOpen={showVideoModal}
-				onClose={() => {
-					setShowVideoModal(false);
-					setActiveVideo(null);
-				}}
-				size="xl"
-				title={activeVideo?.title}
-			>
-				{activeVideo && (
-					<div className="p-4">
-						<video
-							src={activeVideo.videoUrl}
-							poster={activeVideo.thumbnail}
-							controls
-							autoPlay
-							className="w-full rounded-lg"
-						/>
-						<div className="flex items-center justify-between mt-4">
-							<div className="text-sm text-gray-500">
-								{formatDuration(activeVideo.duration)} • {activeVideo.quality} •{" "}
-								{formatFileSize(activeVideo.size)}
-							</div>
-							<div className="flex gap-2">
-								<button
-									onClick={() => handleDownload(activeVideo)}
-									className="btn-primary btn-sm"
-								>
-									<HiDownload className="w-4 h-4" />
-									Download
-								</button>
-							</div>
-						</div>
-					</div>
-				)}
-			</Modal>
-
-			{/* Delete Modal */}
-			<Modal
-				isOpen={showDeleteModal}
-				onClose={() => {
-					setShowDeleteModal(false);
-					setVideoToDelete(null);
-				}}
-				title="Delete Video"
-				size="sm"
-			>
-				<div className="p-6">
-					<div className="flex items-center justify-center w-12 h-12 bg-error-100 rounded-full mx-auto mb-4">
-						<HiTrash className="w-6 h-6 text-error-600" />
-					</div>
-					<h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
-						Delete "{videoToDelete?.title}"?
-					</h3>
-					<p className="text-sm text-gray-500 text-center mb-6">
-						This action cannot be undone.
-					</p>
-					<div className="flex gap-3">
-						<button
-							onClick={() => {
-								setShowDeleteModal(false);
-								setVideoToDelete(null);
-							}}
-							className="btn-secondary btn-md flex-1"
-						>
-							Cancel
-						</button>
-						<button
-							onClick={confirmDelete}
-							className="btn-danger btn-md flex-1"
-						>
-							Delete
-						</button>
-					</div>
-				</div>
-			</Modal>
-		</>
-	);
-};
-
-export default GalleryPage;
+      {/* Delete Confirmation */}
+      <Modal isOpen={showDeleteModal} onClose={() => { setShowDeleteModal(false); setVideoToDelete(null); }} title="Critical Task: Decommission" size="sm">
+         <div className="space-y-8 text-center pt-4">
+            <div className="w-24 h-24 bg-red-50 text-red-600 rounded-none flex items-center justify-center mx-auto border border-red-100 shadow-xl">
+               <HiTrash className="w-10 h-10" />
+            </div>
+            <div>
+               <h3 className="text-2xl font-black tracking-tighter uppercase italic mb-2">Permanent Removal</h3>
+               <p className="text-gray-500 font-medium">Attempting to decommission archive <span className="text-black font-extrabold">{videoToDelete?.title}</span>. This operational action is irreversible.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+               <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Abort Task</Button>
+               <Button onClick={confirmDelete} className="bg-red-600 hover:bg-black text-white hover:text-white border-none">Execute</Button>
+            </div>
+         </div>
+      </Modal>
+    </div>
+  );
+} 
