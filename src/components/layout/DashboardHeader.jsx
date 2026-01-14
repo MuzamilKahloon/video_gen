@@ -47,7 +47,7 @@ const DashboardHeader = () => {
 	];
 
 	return (
-		<header className="sticky top-0 z-40 bg-white/40 backdrop-blur-2xl border-b border-gray-100 font-['Plus_Jakarta_Sans',sans-serif]">
+		<header className="sticky top-0 z-40 bg-white/40 backdrop-blur-2xl border-b border-gray-100" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
 			<div className="flex items-center justify-between h-20 px-8">
 				{/* Search Hub */}
 				<div className="flex items-center gap-6 flex-1 max-w-2xl">
@@ -57,14 +57,14 @@ const DashboardHeader = () => {
 
 					<div className="relative w-full group">
 						<HiSearch className={`absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 transition-all duration-500 ${
-							searchFocused ? "text-yellow-500 scale-110" : "text-gray-400"
+							searchFocused ? "text-black scale-110" : "text-black opacity-30"
 						}`} />
 						<input
 							type="text"
 							placeholder="COMMAND + K TO SEARCH ASSETS..."
 							onFocus={() => setSearchFocused(true)}
 							onBlur={() => setSearchFocused(false)}
-							className="w-full bg-transparent border-none pl-8 pr-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-black placeholder-gray-300 focus:outline-none transition-all duration-300"
+							className="w-full bg-transparent border-none pl-8 pr-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-black placeholder-black/20 focus:outline-none transition-all duration-300"
 						/>
             <div className={`absolute bottom-0 left-0 h-[1px] bg-black transition-all duration-500 ${searchFocused ? 'w-full' : 'w-4'}`} />
 					</div>
@@ -76,12 +76,12 @@ const DashboardHeader = () => {
 						<button
 							onClick={() => setNotificationsOpen(!notificationsOpen)}
 							className={`relative p-2.5 transition-all duration-300 rounded-full ${
-								notificationsOpen ? "bg-black text-yellow-500" : "text-gray-400 hover:bg-gray-50"
+								notificationsOpen ? "bg-black text-white" : "text-black opacity-40 hover:bg-gray-50 hover:opacity-100"
 							}`}
 						>
 							<HiBell className="w-5 h-5" />
 							{notifications.some((n) => n.unread) && (
-								<span className="absolute top-2 right-2 w-2 h-2 bg-yellow-400 border-2 border-white rounded-full" />
+								<span className="absolute top-2 right-2 w-2 h-2 border-2 border-white rounded-full" style={{ backgroundColor: '#E7F014' }} />
 							)}
 						</button>
 
@@ -93,15 +93,15 @@ const DashboardHeader = () => {
 									exit={{ opacity: 0, y: 10, scale: 0.95 }}
 									className="absolute right-0 mt-4 w-80 bg-white border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden"
 								>
-									<div className="px-6 py-4 bg-black flex items-center justify-between">
-										<p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Flux Stream</p>
-										<HiLightningBolt className="text-yellow-400 w-4 h-4" />
+									<div className="px-6 py-4 bg-[#F2F2ED] flex items-center justify-between border-b border-black/5">
+										<p className="text-[10px] font-black text-black uppercase tracking-[0.2em]">Flux Stream</p>
+										<HiLightningBolt className="w-4 h-4 text-black" />
 									</div>
 									<div className="max-h-80 overflow-y-auto">
 										{notifications.map((n) => (
 											<div key={n.id} className="p-5 hover:bg-gray-50 border-b border-gray-50 transition-colors cursor-pointer group">
-												<p className="text-[10px] font-black text-black uppercase tracking-tight group-hover:text-yellow-600">{n.title}</p>
-												<p className="text-xs text-gray-400 mt-1 font-medium">{n.message}</p>
+												<p className="text-[10px] font-black text-black uppercase tracking-tight group-hover:text-black/60">{n.title}</p>
+												<p className="text-xs text-black opacity-40 mt-1 font-medium">{n.message}</p>
 											</div>
 										))}
 									</div>
@@ -115,7 +115,7 @@ const DashboardHeader = () => {
 						<button
 							onClick={() => setUserMenuOpen(!userMenuOpen)}
 							className={`flex items-center gap-4 py-2 pl-2 pr-4 transition-all duration-300 ${
-								userMenuOpen ? "bg-black text-white" : "hover:bg-gray-50"
+								userMenuOpen ? "bg-black text-white" : "hover:bg-gray-50 hover:text-black"
 							}`}
 						>
 							<div className="relative flex items-center justify-center">
@@ -127,12 +127,12 @@ const DashboardHeader = () => {
                 />
 							</div>
               <div className="hidden xl:block text-left">
-                <p className={`text-[10px] font-black uppercase tracking-tight transition-colors ${userMenuOpen ? "text-yellow-400" : "text-black"}`}>
+                <p className={`text-[10px] font-bold uppercase tracking-tight transition-colors ${userMenuOpen ? "text-[#E7F014]" : "text-black"}`}>
                   {user?.name}
                 </p>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-1 h-1 bg-yellow-400" />
-                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Verified Agent</p>
+                  <span className="w-1 h-1" style={{ backgroundColor: '#E7F014' }} />
+                  <p className="text-[9px] font-bold text-black opacity-40 uppercase tracking-tighter">Verified Agent</p>
                 </div>
               </div>
 						</button>
@@ -143,15 +143,16 @@ const DashboardHeader = () => {
 									initial={{ opacity: 0, y: 10 }}
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: 10 }}
-									className="absolute right-0 mt-4 w-60 bg-white border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden font-['Plus_Jakarta_Sans',sans-serif]"
+									className="absolute right-0 mt-4 w-60 bg-white border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden"
+									style={{ fontFamily: "'Neue Montreal', sans-serif" }}
 								>
-									<div className="p-6 bg-black border-b border-white/5">
-                    <p className="text-[10px] font-black text-white uppercase tracking-widest">{user?.name}</p>
-                    <p className="text-[9px] font-bold text-gray-500 uppercase tracking-tight truncate mt-1">{user?.email}</p>
+									<div className="p-6 bg-[#F2F2ED] border-b border-black/5">
+                    <p className="text-[10px] font-black text-black uppercase tracking-widest">{user?.name}</p>
+                    <p className="text-[9px] font-bold text-black opacity-40 uppercase tracking-tight truncate mt-1">{user?.email}</p>
 									</div>
 
 									<Link to="/dashboard/settings" onClick={() => setUserMenuOpen(false)}>
-										<div className="flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-black hover:bg-gray-50 transition-all border-b border-gray-50">
+										<div className="flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-black opacity-40 hover:text-black hover:bg-gray-50 transition-all border-b border-gray-50">
 											<HiCog className="w-4 h-4" />
 											<span>Settings</span>
 										</div>

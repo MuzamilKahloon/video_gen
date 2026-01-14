@@ -17,7 +17,8 @@ import {
 const AnimatedLine = ({ className = "" }) => (
   <div className={`h-[1px] bg-gray-200 overflow-hidden ${className}`}>
     <motion.div
-      className="w-1/3 h-full bg-yellow-400"
+      className="w-1/3 h-full"
+      style={{ backgroundColor: '#E7F014' }}
       animate={{ x: ["-100%", "300%"] }}
       transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
     />
@@ -38,7 +39,7 @@ const FeaturesPage = () => {
         "Automatic fallback for reliability",
         "Continuous quality improvements",
       ],
-      color: "bg-yellow-400",
+      color: "style-yellow",
     },
     {
       icon: HiPhotograph,
@@ -50,8 +51,7 @@ const FeaturesPage = () => {
         "Batch processing support",
         "Smart image selection & ordering",
       ],
-      color: "bg-black",
-      textColor: "text-white",
+      color: "bg-[#F2F2ED]",
     },
     {
       icon: HiSparkles,
@@ -63,7 +63,7 @@ const FeaturesPage = () => {
         "Smooth transitions & effects",
         "Fully customizable styles",
       ],
-      color: "bg-gray-100",
+      color: "bg-white",
     },
     {
       icon: HiClock,
@@ -75,7 +75,7 @@ const FeaturesPage = () => {
         "Live progress tracking",
         "Instant notification system",
       ],
-      color: "bg-gray-100",
+      color: "bg-[#F2F2ED]",
     },
     {
       icon: HiDownload,
@@ -87,7 +87,7 @@ const FeaturesPage = () => {
         "MP4, WebM, and GIF formats",
         "16:9, 9:16, 1:1 aspect ratios",
       ],
-      color: "bg-yellow-400",
+      color: "style-yellow",
     },
     {
       icon: HiShieldCheck,
@@ -95,8 +95,7 @@ const FeaturesPage = () => {
       description:
         "Bank-level security with end-to-end encryption, secure cloud storage, and full compliance standards.",
       benefits: ["SSL encryption standard", "Secure AWS S3 storage", "GDPR compliant system"],
-      color: "bg-black",
-      textColor: "text-white",
+      color: "bg-white",
     },
   ];
 
@@ -108,7 +107,7 @@ const FeaturesPage = () => {
   ];
 
   return (
-    <div className="w-full overflow-hidden font-['Plus_Jakarta_Sans',sans-serif] bg-white text-black">
+    <div className="w-full overflow-hidden bg-white text-black" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
       {/* Hero Section */}
       <section className="pt-32 pb-16 md:pt-48 md:pb-24 px-4 bg-white">
         <div className="max-w-5xl mx-auto text-center">
@@ -117,7 +116,7 @@ const FeaturesPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="inline-block mb-6"
           >
-            <span className="bg-yellow-400 text-black font-bold text-[10px] uppercase tracking-[0.2em] px-4 py-2">
+            <span className="text-black font-bold text-[10px] uppercase tracking-[0.2em] px-4 py-2" style={{ backgroundColor: '#E7F014' }}>
               The Loomo Feature Set
             </span>
           </motion.div>
@@ -126,7 +125,7 @@ const FeaturesPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-7xl font-bold mb-8 leading-tight tracking-tighter"
+            className="text-4xl md:text-6xl font-bold mb-4 md:mb-6 leading-tight"
           >
             Built for agents who<br />value their time
           </motion.h1>
@@ -135,7 +134,7 @@ const FeaturesPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-lg md:text-xl text-gray-500 mb-12 max-w-2xl mx-auto leading-relaxed"
+            className="text-base mb-8 max-w-2xl mx-auto text-black opacity-60"
           >
             We've combined elite AI generation with a workflow so simple, it feels like cheating. Professional videos in under 60 seconds.
           </motion.p>
@@ -146,10 +145,10 @@ const FeaturesPage = () => {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <button className="w-full sm:w-auto px-10 py-5 bg-yellow-400 text-black font-bold hover:bg-yellow-500 transition-all shadow-xl hover:-translate-y-1">
+            <button className="w-full sm:w-auto px-10 py-5 text-black font-bold transition-all shadow-xl hover:-translate-y-1" style={{ backgroundColor: '#E7F014' }}>
               Start Free Today →
             </button>
-            <button className="w-full sm:w-auto px-10 py-5 border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">
+            <button className="w-full sm:w-auto px-10 py-5 border-2 text-black font-bold hover:opacity-80 transition-all" style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
               Watch Demo
             </button>
           </motion.div>
@@ -157,13 +156,13 @@ const FeaturesPage = () => {
       </section>
 
       {/* Feature Grid Section */}
-      <section className="py-20 md:py-32 px-4 bg-[#f9f9f7]">
+      <section className="py-20 md:py-32 px-4" style={{ backgroundColor: '#F2F2ED' }}>
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 md:mb-24 text-center md:text-left">
-            <h2 className="text-3xl md:text-5xl font-bold max-w-2xl leading-tight tracking-tight mb-6 md:mb-0">
+            <h2 className="text-2xl md:text-4xl font-bold text-black max-w-2xl leading-tight mb-4 md:mb-0">
               The fastest way to create property videos. Period.
             </h2>
-            <div className="bg-yellow-400 text-black font-bold text-[10px] uppercase tracking-wider px-4 py-2">
+            <div className="text-black font-bold text-[10px] uppercase tracking-wider px-4 py-2" style={{ backgroundColor: '#E7F014' }}>
               Core Capabilities
             </div>
           </div>
@@ -178,17 +177,18 @@ const FeaturesPage = () => {
                 viewport={{ once: true }}
                 onMouseEnter={() => setHoveredFeature(index)}
                 onMouseLeave={() => setHoveredFeature(null)}
-                className={`relative p-10 md:p-12 h-full flex flex-col ${feature.color} ${feature.textColor || 'text-black'} shadow-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2`}
+                className={`relative p-10 md:p-12 h-full flex flex-col text-black shadow-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2`}
+                style={{ backgroundColor: feature.color === 'style-yellow' ? '#E7F014' : feature.color === 'bg-white' ? '#FFFFFF' : '#F2F2ED' }}
               >
                 <div className="mb-8">
-                  <feature.icon className={`w-12 h-12 ${feature.color === 'bg-black' ? 'text-yellow-400' : 'text-black'}`} />
+                  <feature.icon className="w-12 h-12 text-black" />
                 </div>
                 
-                <h3 className="text-2xl md:text-3xl font-bold mb-6 tracking-tight leading-tight">
+                <h3 className="text-2xl font-bold mb-6">
                   {feature.title}
                 </h3>
                 
-                <p className={`mb-8 opacity-80 leading-relaxed ${feature.color === 'bg-black' ? 'text-gray-300' : 'text-gray-600'}`}>
+                <p className="mb-8 text-black opacity-60">
                   {feature.description}
                 </p>
 
@@ -213,11 +213,11 @@ const FeaturesPage = () => {
       {/* Comparison Section */}
       <section className="py-20 md:py-32 px-4 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-yellow-400 p-8 md:p-20 relative overflow-hidden">
+          <div className="p-8 md:p-20 relative overflow-hidden" style={{ backgroundColor: '#E7F014' }}>
             <div className="relative z-10">
               <div className="grid lg:grid-cols-2 gap-12 md:gap-20 items-center">
                 <div>
-                  <h2 className="text-3xl md:text-5xl font-bold mb-8 leading-tight tracking-tight">
+                  <h2 className="text-2xl md:text-4xl font-bold text-black mb-6 leading-tight">
                     Why waste weeks when you can have it in minutes?
                   </h2>
                   <p className="text-lg md:text-xl font-medium mb-12 opacity-90 max-w-xl">
@@ -226,26 +226,26 @@ const FeaturesPage = () => {
                   
                   <div className="grid grid-cols-2 gap-8">
                     <div>
-                      <div className="text-4xl md:text-6xl font-black mb-2 tracking-tighter">100x</div>
+                      <div className="text-4xl md:text-6xl font-black mb-2 tracking-tight">100x</div>
                       <div className="text-sm font-bold uppercase tracking-widest opacity-80">Faster Delivery</div>
                     </div>
                     <div>
-                      <div className="text-4xl md:text-6xl font-black mb-2 tracking-tighter">90%</div>
+                      <div className="text-4xl md:text-6xl font-black mb-2 tracking-tight">90%</div>
                       <div className="text-sm font-bold uppercase tracking-widest opacity-80">Cost Reduction</div>
                     </div>
                   </div>
                 </div>
 
                 <div className="grid gap-6">
-                  <div className="bg-white/40 backdrop-blur-md p-8 shadow-xl">
+                  <div className="bg-white/40 shadow-xl p-8">
                     <h4 className="text-xs font-black uppercase tracking-[0.2em] mb-4 text-black/40">The Legacy Way</h4>
                     <p className="text-xl md:text-2xl font-bold text-black/60 line-through mb-2">2 Weeks Production</p>
                     <p className="text-xl md:text-2xl font-bold text-black/60 line-through">$2,000+ Per Video</p>
                   </div>
-                  <div className="bg-black p-8 shadow-2xl scale-105">
-                    <h4 className="text-xs font-black uppercase tracking-[0.2em] mb-4 text-yellow-400">The loomo Way</h4>
-                    <p className="text-2xl md:text-4xl font-black text-white mb-2 tracking-tighter">60 Seconds</p>
-                    <p className="text-2xl md:text-4xl font-black text-white tracking-tighter">$10/Video or Less</p>
+                  <div className="bg-white p-8 shadow-2xl scale-105 border-2 border-[#E7F014]">
+                    <h4 className="text-xs font-black uppercase tracking-[0.2em] mb-4 text-black opacity-40">The loomo Way</h4>
+                    <p className="text-2xl md:text-4xl font-black text-black mb-2 tracking-tight">60 Seconds</p>
+                    <p className="text-2xl md:text-4xl font-black text-black tracking-tight">$10/Video or Less</p>
                   </div>
                 </div>
               </div>
@@ -258,11 +258,11 @@ const FeaturesPage = () => {
       </section>
 
       {/* Bento Grid Additional Features */}
-      <section className="py-20 md:py-32 px-4 bg-[#f9f9f7]">
+      <section className="py-20 md:py-32 px-4" style={{ backgroundColor: '#F2F2ED' }}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 md:mb-24">
-            <h2 className="text-3xl md:text-6xl font-bold mb-6 tracking-tighter">Even more capabilities</h2>
-            <div className="w-24 h-2 bg-yellow-400 mx-auto" />
+            <h2 className="text-2xl md:text-4xl font-bold mb-6">Even more capabilities</h2>
+            <div className="w-24 h-2 mx-auto" style={{ backgroundColor: '#E7F014' }} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -272,11 +272,11 @@ const FeaturesPage = () => {
                 whileHover={{ scale: 1.05 }}
                 className="bg-white p-10 shadow-sm hover:shadow-xl transition-all border border-gray-100 flex flex-col h-full"
               >
-                <div className="w-12 h-12 bg-yellow-400 flex items-center justify-center mb-8">
+                <div className="w-12 h-12 flex items-center justify-center mb-8" style={{ backgroundColor: '#E7F014' }}>
                   <feature.icon className="w-6 h-6 text-black" />
                 </div>
-                <h3 className="text-xl font-bold mb-4 tracking-tight">{feature.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                <h3 className="text-2xl font-bold mb-6">{feature.title}</h3>
+                <p className="text-black opacity-60">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -293,15 +293,15 @@ const FeaturesPage = () => {
               viewport={{ once: true }}
               className="text-center md:text-left"
             >
-              <h2 className="text-4xl md:text-6xl font-black mb-10 leading-none tracking-tighter">
+              <h2 className="text-2xl md:text-4xl font-bold mb-6 leading-tight">
                 READY TO<br />START<br />SAVING TIME?
               </h2>
               <div className="flex justify-center md:justify-start">
-                <button className="bg-yellow-400 text-black font-black px-10 py-5 hover:bg-yellow-500 transition shadow-2xl hover:-translate-y-1">
+                <button className="text-black font-black px-10 py-5 transition shadow-2xl hover:-translate-y-1" style={{ backgroundColor: '#E7F014' }}>
                   CREATE A VIDEO →
                 </button>
               </div>
-              <p className="mt-8 text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em]">
+              <p className="mt-8 font-bold uppercase text-[10px] tracking-[0.2em] text-black opacity-40">
                 25 Credits Free • No CC Required • 60s Setup
               </p>
             </motion.div>
@@ -310,14 +310,13 @@ const FeaturesPage = () => {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="relative h-[400px] md:h-[600px] bg-black shadow-2xl"
+              className="relative h-[400px] md:h-[600px] bg-[#F2F2ED] shadow-2xl rounded-2xl overflow-hidden"
             >
               <img
                 src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&h=1200&fit=crop"
                 alt="Modern Luxury Home"
-                className="w-full h-full object-cover opacity-80"
+                className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-yellow-400/10 mix-blend-multiply" />
             </motion.div>
           </div>
         </div>

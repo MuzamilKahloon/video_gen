@@ -15,9 +15,10 @@ import { useAuthStore } from "@store/authStore";
 
 // Enhanced animated line from DashboardHome
 const AnimatedLine = ({ className = "" }) => (
-  <div className={`h-[1px] bg-gray-200 overflow-hidden ${className}`}>
+  <div className={`h-[1px] bg-black/5 overflow-hidden ${className}`}>
     <motion.div
-      className="w-1/3 h-full bg-yellow-400"
+      className="w-1/3 h-full"
+      style={{ backgroundColor: '#E7F014' }}
       animate={{ x: ["-100%", "300%"] }}
       transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
     />
@@ -27,11 +28,11 @@ const AnimatedLine = ({ className = "" }) => (
 // Buttons matching Dashboard style
 const Button = ({ children, className = "", variant = "primary", ...props }) => {
   const variants = {
-    primary: "bg-black text-white hover:bg-yellow-400 hover:text-black shadow-xl hover:-translate-y-1 transition-all duration-300 font-bold",
-    secondary: "bg-white border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 text-black font-bold",
-    black: "bg-black text-white hover:bg-yellow-400 hover:text-black transition-all font-bold",
-    ghost: "bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-black transition-all font-bold",
-    danger: "bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-all font-bold"
+    primary: "bg-[#E7F014] text-black hover:bg-black hover:text-white shadow-xl hover:-translate-y-1 transition-all duration-300 font-bold",
+    secondary: "bg-white border border-black/10 shadow-sm hover:shadow-lg transition-all duration-300 text-black font-bold",
+    black: "bg-black text-white hover:bg-black/90 transition-all font-bold",
+    ghost: "bg-black/5 hover:bg-black/10 text-black opacity-40 hover:opacity-100 transition-all font-bold",
+    danger: "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all font-bold"
   };
   return (
     <button 
@@ -60,9 +61,9 @@ const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
         className={cn("bg-white w-full shadow-2xl relative overflow-hidden", sizes[size])} 
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-8 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-xl font-black text-black tracking-tighter uppercase">{title}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-black"><HiX className="w-6 h-6" /></button>
+        <div className="p-8 border-b border-black/5 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-black">{title}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-black/5 transition-colors text-black/40 hover:text-black"><HiX className="w-6 h-6" /></button>
         </div>
         <div className="p-8">{children}</div>
         <AnimatedLine className="absolute bottom-0 left-0 right-0" />
@@ -117,11 +118,11 @@ const PlanCard = ({ plan, isCurrentPlan, onSelect, isPopular }) => (
     <div>
       <div className="flex justify-between items-start mb-8">
         <div>
-          <h3 className="text-2xl font-black text-black tracking-tighter uppercase">{plan.name}</h3>
-          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{plan.credits} Deployment Units</p>
+          <h3 className="text-2xl font-bold text-black">{plan.name}</h3>
+          <p className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest mt-1">{plan.credits} Deployment Units</p>
         </div>
         {isPopular && (
-          <span className="bg-black text-yellow-400 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">
+          <span className="bg-[#E7F014] text-black px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">
             Recommended
           </span>
         )}
@@ -130,14 +131,14 @@ const PlanCard = ({ plan, isCurrentPlan, onSelect, isPopular }) => (
       <div className="mb-8">
         <div className="flex flex-col gap-1">
           <span className="text-5xl font-black text-black leading-none">${plan.price}.00</span>
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">/ Month</span>
+          <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-[0.2em]">/ Month</span>
         </div>
       </div>
 
       <ul className="space-y-4 mb-8">
         {plan.features.map((feature, i) => (
           <li key={i} className="flex items-start gap-3 text-[10px] font-black text-black uppercase tracking-[0.2em]">
-            <HiCheckCircle className="w-4 h-4 text-yellow-400 shrink-0" />
+            <HiCheckCircle className="w-4 h-4 text-[#E7F014] shrink-0" />
             <span>{feature}</span>
           </li>
         ))}
@@ -199,7 +200,7 @@ export default function BillingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f9f9f7] p-12 flex items-center justify-center">
+      <div className="min-h-screen bg-[#F2F2ED] p-12 flex items-center justify-center" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
         <LoadingSpinner text="FETCHING PROTOCOL DATA..." />
       </div>
     );
@@ -217,7 +218,7 @@ export default function BillingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f9f9f7] text-black font-['Plus_Jakarta_Sans',sans-serif] p-6 lg:p-12 overflow-x-hidden">
+    <div className="min-h-screen bg-[#F2F2ED] text-black p-6 lg:p-12 overflow-x-hidden" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
       <Helmet><title>Protocol Management - Loomo AI</title></Helmet>
       
       {/* Hero Section */}
@@ -227,7 +228,7 @@ export default function BillingPage() {
           animate={{ opacity: 1, y: 0 }}
           className="inline-block mb-6"
         >
-          <span className="bg-yellow-400 text-black font-black text-[10px] uppercase tracking-[0.2em] px-4 py-2">
+          <span className="text-black font-bold text-[10px] uppercase tracking-[0.2em] px-4 py-2" style={{ backgroundColor: '#E7F014' }}>
             Operational Billing
           </span>
         </motion.div>
@@ -238,15 +239,15 @@ export default function BillingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-4xl md:text-5xl font-black text-black tracking-tighter leading-none mb-4 uppercase"
+              className="text-4xl md:text-6xl font-bold text-black leading-tight mb-4 md:mb-6"
             >
-              Manage Protocol,<br /><span className="text-gray-300">Subscription</span>
+              Manage Protocol,<br /><span className="opacity-40">Subscription</span>
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-lg text-gray-500 max-w-xl leading-relaxed font-medium"
+              className="text-black opacity-60 text-base max-w-xl"
             >
               Control your rendering resources and archival deployments with high-precision instruments.
             </motion.p>
@@ -258,12 +259,12 @@ export default function BillingPage() {
              transition={{ delay: 0.3 }}
              className="flex gap-4"
           >
-             <div className="flex flex-col items-end gap-1 px-6 border-r border-gray-200">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Usage Velocity</span>
+             <div className="flex flex-col items-end gap-1 px-6 border-r border-black/10">
+                <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest leading-none">Usage Velocity</span>
                 <span className="text-2xl font-black text-black tracking-tight">{Math.round(creditsPercentage)}%</span>
              </div>
              <div className="flex flex-col items-end gap-1 px-6">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Active Tier</span>
+                <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest leading-none">Active Tier</span>
                 <span className="text-2xl font-black text-black tracking-tight uppercase">{currentPlan?.name}</span>
              </div>
           </motion.div>
@@ -272,26 +273,26 @@ export default function BillingPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        <div className="bg-black text-white p-8 relative shadow-2xl group overflow-hidden min-h-[180px] flex flex-col justify-between">
+        <div className="bg-white border border-black/5 p-8 relative shadow-2xl group overflow-hidden min-h-[180px] flex flex-col justify-between">
            <div className="flex justify-between items-start relative z-10">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-white/40">Remaining Units</p>
-              <HiLightningBolt className="w-6 h-6 text-yellow-400" />
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-black opacity-40">Remaining Units</p>
+              <HiLightningBolt className="w-6 h-6 text-[#E7F014]" />
            </div>
            <div>
-              <p className="text-5xl font-black tracking-tighter text-yellow-400 leading-none mb-2">{billingData.credits.remaining}</p>
-              <div className="w-full h-1 bg-white/10 mt-4 relative overflow-hidden">
+              <p className="text-5xl font-black tracking-tighter text-black leading-none mb-2">{billingData.credits.remaining}</p>
+              <div className="w-full h-1 bg-black/5 mt-4 relative overflow-hidden">
                 <motion.div 
-                  initial={{ width: 0 }} 
-                  animate={{ width: `${100 - creditsPercentage}%` }} 
-                  className="absolute inset-0 bg-yellow-400" 
+                   initial={{ width: 0 }} 
+                   animate={{ width: `${100 - creditsPercentage}%` }} 
+                   className="absolute inset-0 bg-[#E7F014]" 
                 />
               </div>
            </div>
-           <AnimatedLine className="absolute bottom-0 left-0 right-0 group-hover:bg-yellow-400/20" />
+           <AnimatedLine className="absolute bottom-0 left-0 right-0 group-hover:bg-[#E7F014]/20" />
         </div>
 
         <UsageStatCard label="Monthly Outputs" value={billingData.usage.thisMonth.videosGenerated} icon={HiVideoCamera} trend={12} />
-        <UsageStatCard label="Storage Index" value={`${billingData.usage.thisMonth.storageUsed}GB`} icon={HiCloud} colorClass="text-gray-400" />
+        <UsageStatCard label="Storage Index" value={`${billingData.usage.thisMonth.storageUsed}GB`} icon={HiCloud} colorClass="text-black opacity-40" />
         <UsageStatCard label="Next Sync" value={formatDate(billingData.subscription.nextBillingDate).split(",")[0]} icon={HiCalendar} colorClass="text-black" />
       </div>
 
@@ -303,7 +304,7 @@ export default function BillingPage() {
              onClick={() => setActiveTab(tab.id)}
              className={cn(
                "flex-1 flex items-center justify-center gap-4 py-6 px-8 uppercase text-[10px] font-black tracking-[0.2em] transition-all whitespace-nowrap",
-               activeTab === tab.id ? "bg-black text-white shadow-xl" : "text-gray-400 hover:text-black hover:bg-gray-50"
+               activeTab === tab.id ? "bg-[#E7F014] text-black shadow-xl" : "text-black opacity-40 hover:text-black hover:bg-black/5"
              )}
            >
              <tab.icon className="w-4 h-4 shrink-0" />
@@ -326,22 +327,22 @@ export default function BillingPage() {
               <div className="grid lg:grid-cols-3 gap-8">
                  <div className="lg:col-span-1 space-y-6">
                     <div className="flex items-center gap-4 mb-2">
-                       <h2 className="text-xl font-black tracking-tight uppercase text-black">Quick Actions</h2>
-                       <div className="h-[1px] bg-gray-200 flex-1" />
+                       <h2 className="text-xl font-bold text-black">Quick Actions</h2>
+                       <div className="h-[1px] bg-black/5 flex-1" />
                     </div>
                     
                     <button onClick={() => setActiveTab("plans")} className="w-full block group text-left">
-                       <div className="bg-white p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-                          <div className="w-12 h-12 bg-yellow-400 flex items-center justify-center mb-6">
+                       <div className="bg-white p-8 border border-black/5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
+                          <div className="w-12 h-12 flex items-center justify-center mb-6" style={{ backgroundColor: '#E7F014' }}>
                              <HiArrowUp className="w-6 h-6 text-black" />
                           </div>
-                          <h3 className="text-xl font-black mb-2 tracking-tight group-hover:text-yellow-600 transition-colors">
+                          <h3 className="text-xl font-bold mb-2">
                              Upgrade Protocol
                           </h3>
-                          <p className="text-gray-500 text-sm leading-relaxed mb-6">
+                          <p className="text-black opacity-60 text-sm leading-relaxed mb-6">
                              Expand your rendering capacity and unlock enterprise features.
                           </p>
-                          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest group-hover:gap-4 transition-all">
+                          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest group-hover:gap-4 transition-all text-black">
                              View Options <HiArrowRight />
                           </div>
                        </div>
@@ -357,47 +358,47 @@ export default function BillingPage() {
 
                  <div className="lg:col-span-2 space-y-8">
                     <div className="flex items-center gap-4 mb-2">
-                       <h2 className="text-xl font-black tracking-tight uppercase text-black">Sync Configuration</h2>
-                       <div className="h-[1px] bg-gray-200 flex-1" />
+                       <h2 className="text-xl font-bold text-black">Sync Configuration</h2>
+                       <div className="h-[1px] bg-black/5 flex-1" />
                     </div>
                     
-                    <div className="bg-white border border-gray-100 p-12 shadow-sm relative group overflow-hidden">
-                       <div className="grid grid-cols-2 md:grid-cols-3 gap-12 relative z-10 font-['Plus_Jakarta_Sans',sans-serif]">
+                    <div className="bg-white border border-black/5 p-12 shadow-sm relative group overflow-hidden">
+                       <div className="grid grid-cols-2 md:grid-cols-3 gap-12 relative z-10">
                           <div>
-                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Identifier</span>
+                             <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest block mb-2">Identifier</span>
                              <span className="text-lg font-black tracking-tight uppercase text-black">#{billingData.subscription.plan}</span>
                           </div>
                           <div>
-                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Cycle Rate</span>
+                             <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest block mb-2">Cycle Rate</span>
                              <span className="text-lg font-black tracking-tight text-black">{formatCurrency(billingData.subscription.amount)}/mo</span>
                           </div>
                           <div>
-                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Operational Status</span>
+                             <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest block mb-2">Operational Status</span>
                              <StatusBadge status="active" />
                           </div>
                           <div>
-                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Protocol Units</span>
+                             <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest block mb-2">Protocol Units</span>
                              <span className="text-lg font-black tracking-tight text-black">{currentPlan?.credits} Total</span>
                           </div>
                           <div>
-                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Unit Efficiency</span>
+                             <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest block mb-2">Unit Efficiency</span>
                              <span className="text-lg font-black tracking-tight text-black">High Velocity</span>
                           </div>
                           <div>
-                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Next Billing Sync</span>
+                             <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest block mb-2">Next Billing Sync</span>
                              <span className="text-lg font-black tracking-tight text-black">{formatDate(billingData.subscription.nextBillingDate)}</span>
                           </div>
                        </div>
                        <AnimatedLine className="absolute bottom-0 left-0 right-0" />
                     </div>
 
-                    <div className="bg-black text-white p-12 relative overflow-hidden group">
+                    <div className="bg-white border border-black/5 p-12 relative overflow-hidden group shadow-lg">
                        <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
                           <div className="max-w-md">
-                             <h3 className="text-3xl font-black tracking-tighter uppercase text-yellow-400 mb-2">Auto-Refill Units</h3>
-                             <p className="text-white/40 text-xs font-black uppercase tracking-widest leading-relaxed">Never stall your pipeline. Synchronize automatic unit injections when your reserve falls below threshold.</p>
+                              <h3 className="text-3xl font-bold text-black mb-2">Auto-Refill Units</h3>
+                             <p className="text-black opacity-40 text-xs font-black uppercase tracking-widest leading-relaxed">Never stall your pipeline. Synchronize automatic unit injections when your reserve falls below threshold.</p>
                           </div>
-                          <Button variant="primary" className="bg-white text-black hover:bg-yellow-400 min-w-[200px]">Configure Link <HiSparkles /></Button>
+                          <Button variant="primary" className="min-w-[200px]">Configure Link <HiSparkles /></Button>
                        </div>
                        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/5 to-transparent skew-x-12 translate-x-32 group-hover:translate-x-12 transition-transform duration-1000" />
                        <AnimatedLine className="absolute bottom-0 left-0 right-0 opacity-20" />
@@ -420,11 +421,11 @@ export default function BillingPage() {
                     ))}
                  </div>
                  
-                 <div className="bg-white border border-gray-100 p-12 text-center group relative overflow-hidden">
-                    <HiCube className="w-12 h-12 text-gray-200 mx-auto mb-6 group-hover:text-yellow-400 transition-colors duration-500" />
-                    <h4 className="text-2xl font-black text-black tracking-tighter uppercase mb-2">Custom Grid Architecture</h4>
-                    <p className="text-gray-400 text-sm font-medium max-w-lg mx-auto mb-8">Need massive organizational throughput? We design custom deployment pipelines for high-velocity teams.</p>
-                    <button className="text-[10px] font-black uppercase tracking-[0.2em] border-b-2 border-yellow-400 pb-1 hover:text-yellow-600 transition-all">Initialize Enterprise Sync</button>
+                 <div className="bg-white border border-black/5 p-12 text-center group relative overflow-hidden shadow-sm">
+                    <HiCube className="w-12 h-12 text-black opacity-20 mx-auto mb-6 group-hover:text-[#E7F014] group-hover:opacity-100 transition-all duration-500" />
+                     <h4 className="text-2xl font-bold text-black mb-2">Custom Grid Architecture</h4>
+                    <p className="text-black opacity-40 text-sm font-medium max-w-lg mx-auto mb-8">Need massive organizational throughput? We design custom deployment pipelines for high-velocity teams.</p>
+                    <button className="text-[10px] font-black uppercase tracking-[0.2em] border-b-2 border-[#E7F014] pb-1 hover:text-black transition-all">Initialize Enterprise Sync</button>
                     <AnimatedLine className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                  </div>
               </div>
@@ -434,18 +435,18 @@ export default function BillingPage() {
               <div className="bg-white border border-gray-100 shadow-sm overflow-hidden">
                  <div className="p-10 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div>
-                       <h3 className="text-2xl font-black tracking-tighter uppercase text-black">Sync Credentials</h3>
+                        <h3 className="text-2xl font-bold text-black">Sync Credentials</h3>
                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Operational Financial Gateways</p>
                     </div>
                     <Button variant="primary">Integrate Credential <HiPlus /></Button>
                  </div>
-                 <div className="divide-y divide-gray-100">
+                 <div className="divide-y divide-black/5">
                     {billingData.paymentMethods.map(method => (
-                      <div key={method.id} className="p-10 flex flex-col md:flex-row items-center justify-between gap-8 hover:bg-gray-50 transition-all group">
+                      <div key={method.id} className="p-10 flex flex-col md:flex-row items-center justify-between gap-8 hover:bg-black/5 transition-all group">
                          <div className="flex items-center gap-10 flex-1">
                             <div className={cn(
                               "w-16 h-10 flex items-center justify-center font-black text-[10px] border uppercase transition-all",
-                              method.isDefault ? "bg-black text-white border-black" : "bg-white text-black border-gray-200 group-hover:border-black"
+                              method.isDefault ? "bg-black text-white border-black" : "bg-white text-black border-black/10 group-hover:border-black"
                             )}>
                                {method.brand}
                             </div>
@@ -454,12 +455,12 @@ export default function BillingPage() {
                                   <span className="text-lg font-black uppercase tracking-tighter text-black">•••• {method.last4}</span>
                                   {method.isDefault && <StatusBadge status="active" />}
                                </div>
-                               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Expiry Sync: {method.expiryMonth}/{method.expiryYear}</p>
+                               <p className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest mt-1">Expiry Sync: {method.expiryMonth}/{method.expiryYear}</p>
                             </div>
                          </div>
                          <div className="flex items-center gap-4">
-                            {!method.isDefault && <button className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors">Set Primary</button>}
-                            <button className="p-4 hover:bg-black hover:text-white transition-all text-gray-400">
+                            {!method.isDefault && <button className="text-[10px] font-black uppercase tracking-widest text-black opacity-40 hover:opacity-100 transition-colors">Set Primary</button>}
+                            <button className="p-4 hover:bg-black hover:text-white transition-all text-black opacity-40 group-hover:opacity-100">
                                <HiDotsVertical className="w-5 h-5" />
                             </button>
                          </div>
@@ -472,12 +473,12 @@ export default function BillingPage() {
            {activeTab === "invoices" && (
               <div className="bg-white border border-gray-100 shadow-sm overflow-hidden">
                  <div className="p-10 border-b border-gray-100 flex justify-between items-center">
-                    <h2 className="text-xl font-black uppercase tracking-tight text-black">Archival Ledger</h2>
+                     <h2 className="text-xl font-bold text-black">Archival Ledger</h2>
                     <button className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors">Export Record →</button>
                  </div>
                  <div className="overflow-x-auto">
                     <table className="w-full text-left font-['Plus_Jakarta_Sans',sans-serif]">
-                       <thead className="bg-[#f9f9f7] border-b border-gray-100 text-[10px] font-black text-black uppercase tracking-[0.2em]">
+                        <thead className="bg-[#F2F2ED] border-b border-gray-100 text-[10px] font-bold text-black uppercase tracking-[0.2em]">
                           <tr>
                              <th className="px-10 py-6">ID</th>
                              <th className="px-10 py-6">Timestamp</th>
@@ -487,16 +488,16 @@ export default function BillingPage() {
                              <th className="px-10 py-6 text-right">Records</th>
                           </tr>
                        </thead>
-                       <tbody className="divide-y divide-gray-100">
+                       <tbody className="divide-y divide-black/5">
                           {billingData.invoices.map(invoice => (
-                            <tr key={invoice.id} className="group hover:bg-gray-50 transition-colors">
+                            <tr key={invoice.id} className="group hover:bg-black/5 transition-colors">
                                <td className="px-10 py-8 text-[10px] font-black text-black">#{invoice.id}</td>
-                               <td className="px-10 py-8 text-[10px] font-black text-gray-400">{formatDate(invoice.date)}</td>
+                               <td className="px-10 py-8 text-[10px] font-black text-black opacity-40">{formatDate(invoice.date)}</td>
                                <td className="px-10 py-8 text-[10px] font-black text-black uppercase tracking-tight">{invoice.description}</td>
                                <td className="px-10 py-8 text-[10px] font-black text-black">{formatCurrency(invoice.amount)}</td>
                                <td className="px-10 py-8"><StatusBadge status="paid" /></td>
                                <td className="px-10 py-8 text-right">
-                                  <button className="w-12 h-12 bg-gray-50 flex items-center justify-center mx-auto group-hover:bg-black group-hover:text-white transition-all">
+                                  <button className="w-12 h-12 bg-black/5 flex items-center justify-center mx-auto group-hover:bg-black group-hover:text-white transition-all text-black">
                                      <HiDownload className="w-5 h-5" />
                                   </button>
                                </td>
@@ -513,18 +514,18 @@ export default function BillingPage() {
                  {billingData.addOns.map(addon => (
                    <div key={addon.id} className="bg-white border border-gray-100 p-10 relative group hover:border-black transition-all flex flex-col justify-between min-h-[320px]">
                       <div>
-                        <div className="w-12 h-12 bg-black text-white flex items-center justify-center mb-8 group-hover:bg-yellow-400 group-hover:text-black transition-colors">
+                        <div className="w-12 h-12 bg-black text-white flex items-center justify-center mb-8 group-hover:bg-[#E7F014] group-hover:text-black transition-colors">
                            <HiPlus className="w-6 h-6" />
                         </div>
-                        <h4 className="text-xl font-black tracking-tighter uppercase text-black mb-2">{addon.name}</h4>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">{addon.description}</p>
+                         <h4 className="text-xl font-bold text-black mb-2">{addon.name}</h4>
+                        <p className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest leading-relaxed">{addon.description}</p>
                       </div>
                       
                       <div className="mt-12 flex items-center justify-between">
                          {addon.options ? (
                             <div className="flex gap-2">
                                {addon.options.slice(0, 3).map((opt, i) => (
-                                 <button key={i} className="px-4 py-2 border border-gray-100 text-[8px] font-black uppercase tracking-widest hover:border-black hover:bg-yellow-400 hover:text-black transition-all">
+                                 <button key={i} className="px-4 py-2 border border-black/10 text-[8px] font-black uppercase tracking-widest hover:border-black hover:bg-[#E7F014] hover:text-black transition-all">
                                     {opt.credits}u
                                  </button>
                                ))}
@@ -532,7 +533,7 @@ export default function BillingPage() {
                          ) : (
                             <div className="flex items-baseline gap-1">
                                <span className="text-2xl font-black text-black leading-none">${addon.price}</span>
-                               <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">/ {addon.unit}</span>
+                               <span className="text-[8px] font-black text-black opacity-40 uppercase tracking-widest">/ {addon.unit}</span>
                             </div>
                          )}
                          <Button variant="black" className="px-6 py-3 h-auto">Inject</Button>
@@ -550,11 +551,11 @@ export default function BillingPage() {
         {showUpgradeModal && (
           <Modal title="Initialize Sync" size="md" isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)}>
             <div className="text-center py-8">
-               <div className="w-20 h-20 bg-yellow-400 text-black flex items-center justify-center mx-auto mb-8 shadow-2xl">
+               <div className="w-20 h-20 bg-[#E7F014] text-black flex items-center justify-center mx-auto mb-8 shadow-2xl">
                   <HiArrowUp className="w-10 h-10" />
                </div>
-               <h3 className="text-3xl font-black tracking-tighter uppercase text-black mb-4">Switch to {selectedPlan?.name} protocol?</h3>
-               <p className="text-sm font-medium text-gray-400 uppercase tracking-widest leading-relaxed max-w-sm mx-auto mb-12">Immediate account architecture reconfiguration required. All remaining credits will be synchronized.</p>
+               <h3 className="text-3xl font-bold text-black mb-4">Switch to {selectedPlan?.name} protocol?</h3>
+               <p className="text-sm font-medium text-black opacity-40 uppercase tracking-widest leading-relaxed max-w-sm mx-auto mb-12">Immediate account architecture reconfiguration required. All remaining credits will be synchronized.</p>
                <div className="flex gap-4">
                   <Button variant="secondary" className="flex-1" onClick={() => setShowUpgradeModal(false)}>Abort Change</Button>
                   <Button variant="primary" className="flex-1" onClick={() => { setBillingData(p => ({ ...p, subscription: { ...p.subscription, plan: selectedPlan.id } })); setShowUpgradeModal(false); }}>Confirm Sync</Button>
@@ -569,8 +570,8 @@ export default function BillingPage() {
                <div className="w-20 h-20 bg-red-50 text-red-600 border border-red-100 flex items-center justify-center mx-auto mb-8 shadow-xl">
                   <HiExclamationCircle className="w-10 h-10" />
                </div>
-               <h3 className="text-2xl font-black tracking-tighter uppercase text-black mb-4">Decommission Protocol?</h3>
-               <p className="text-xs font-black text-gray-400 uppercase tracking-widest leading-relaxed mb-12">All advanced cinematic pipelines will be purged at the end of the current cycle.</p>
+               <h3 className="text-2xl font-bold text-black mb-4">Decommission Protocol?</h3>
+               <p className="text-xs font-black text-black opacity-40 uppercase tracking-widest leading-relaxed mb-12">All advanced cinematic pipelines will be purged at the end of the current cycle.</p>
                <div className="flex gap-4">
                   <Button variant="secondary" className="flex-1" onClick={() => setShowCancelModal(false)}>Maintain</Button>
                   <Button variant="danger" className="flex-1 bg-red-600 text-white" onClick={() => setShowCancelModal(false)}>Suspend</Button>

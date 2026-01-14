@@ -37,9 +37,10 @@ const Navbar = () => {
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm"
+          ? "bg-white/80 backdrop-blur-xl border-b shadow-sm"
           : "bg-transparent"
       }`}
+      style={{ borderBottomColor: scrolled ? 'rgba(0, 0, 0, 0.05)' : 'transparent', fontFamily: "'Neue Montreal', sans-serif" }}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -59,7 +60,8 @@ const Navbar = () => {
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div 
-                  className="absolute w-1.5 h-1.5 bg-yellow-400 rounded-full"
+                  className="absolute w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: '#E7F014' }}
                   animate={{ scale: [1, 1.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
@@ -72,7 +74,7 @@ const Navbar = () => {
                   }}
                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                 />
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-yellow-400 rounded-full" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#E7F014' }} />
               </div>
               <span className="text-3xl font-[900] tracking-tighter text-black">mo</span>
             </div>
@@ -89,11 +91,11 @@ const Navbar = () => {
               >
                 <Link
                   to={item.href}
-                  className={`text-sm font-semibold transition-colors ${
-                    isActive(item.href)
-                      ? "text-black"
-                      : "text-gray-500 hover:text-black"
-                  }`}
+                  className="text-sm font-semibold transition-all duration-300"
+                  style={{ 
+                    color: 'black',
+                    opacity: isActive(item.href) ? 1 : 0.4
+                  }}
                 >
                   {item.name}
                 </Link>
@@ -105,13 +107,14 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-6">
             {isAuthenticated ? (
               <>
-                <Link to="/dashboard" className="text-sm font-semibold text-black hover:text-gray-600 transition-colors">
+                <Link to="/dashboard" className="text-sm font-semibold text-black hover:opacity-80 transition-colors">
                   Dashboard
                 </Link>
                 <Link to="/dashboard/projects/new">
                   <motion.button
-                    className="px-6 py-2.5 bg-yellow-400 text-black text-sm font-bold rounded-full hover:bg-yellow-500 transition-all shadow-sm"
-                    whileHover={{ scale: 1.02 }}
+                    className="px-6 py-2.5 text-black text-sm font-bold rounded-full transition-all shadow-sm"
+                    style={{ backgroundColor: '#E7F014' }}
+                    whileHover={{ scale: 1.02, opacity: 0.9 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     Create Video
@@ -120,13 +123,14 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="text-sm font-semibold text-black hover:text-gray-600 transition-colors">
+                <Link to="/login" className="text-sm font-semibold text-black hover:opacity-80 transition-colors">
                   Log in
                 </Link>
                 <Link to="/showcase">
                   <motion.button
-                    className="px-6 py-2.5 border border-gray-300 text-black text-sm font-bold rounded-full hover:bg-gray-50 transition-all"
-                    whileHover={{ scale: 1.02 }}
+                    className="px-6 py-2.5 border text-black text-sm font-bold rounded-full transition-all"
+                    style={{ borderColor: 'rgba(0, 0, 0, 0.1)' }}
+                    whileHover={{ scale: 1.02, backgroundColor: '#F2F2ED' }}
                     whileTap={{ scale: 0.98 }}
                   >
                     Get a demo
@@ -134,8 +138,9 @@ const Navbar = () => {
                 </Link>
                 <Link to="/register">
                   <motion.button
-                    className="px-6 py-2.5 bg-yellow-400 text-black text-sm font-bold rounded-full hover:bg-yellow-500 transition-all shadow-md"
-                    whileHover={{ scale: 1.02 }}
+                    className="px-6 py-2.5 text-black text-sm font-bold rounded-full transition-all shadow-md"
+                    style={{ backgroundColor: '#E7F014' }}
+                    whileHover={{ scale: 1.02, opacity: 0.9 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     Sign up for free
@@ -148,7 +153,8 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <motion.button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white/50 text-black hover:text-slate-700 hover:border-slate-300 transition-colors"
+            className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-xl border bg-white/50 text-black hover:opacity-80 transition-colors"
+            style={{ borderColor: 'rgba(0, 0, 0, 0.1)' }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -199,11 +205,12 @@ const Navbar = () => {
                 >
                   <Link
                     to={item.href}
-                    className={`block px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                      isActive(item.href)
-                        ? "bg-slate-100 text-black shadow-sm"
-                        : "text-gray-500 hover:text-black hover:bg-slate-50"
-                    }`}
+                    className="block px-4 py-3 rounded-xl text-sm font-semibold transition-all"
+                    style={{ 
+                      backgroundColor: isActive(item.href) ? '#F2F2ED' : 'transparent',
+                      color: 'black',
+                      opacity: isActive(item.href) ? 1 : 0.5
+                    }}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.name}
@@ -251,7 +258,7 @@ const Navbar = () => {
                       to="/showcase"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <button className="w-full px-4 py-3 border border-gray-300 text-black text-sm font-bold rounded-full hover:bg-gray-50 transition-all">
+                      <button className="w-full px-4 py-3 border text-black text-sm font-bold rounded-full transition-all" style={{ borderColor: 'rgba(0, 0, 0, 0.1)' }}>
                         Get a demo
                       </button>
                     </Link>
@@ -259,7 +266,7 @@ const Navbar = () => {
                       to="/register"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <button className="w-full px-4 py-3 bg-yellow-400 text-black text-sm font-bold rounded-full hover:bg-yellow-500 transition-all shadow-md">
+                      <button className="w-full px-4 py-3 text-black text-sm font-bold rounded-full transition-all shadow-md" style={{ backgroundColor: '#E7F014' }}>
                         Sign up for free
                       </button>
                     </Link>

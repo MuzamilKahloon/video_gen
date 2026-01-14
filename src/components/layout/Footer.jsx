@@ -50,7 +50,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gray-50 border-t border-gray-200 py-12 md:py-20 font-['Plus_Jakarta_Sans',sans-serif]">
+    <footer className="py-12 md:py-20 border-t" style={{ backgroundColor: '#F2F2ED', borderTopColor: 'rgba(197, 194, 191, 0.2)', fontFamily: "'Neue Montreal', sans-serif" }}>
       <div className="max-w-7xl mx-auto px-6 md:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           {/* Logo Section */}
@@ -67,7 +67,8 @@ const Footer = () => {
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   />
                   <motion.div 
-                    className="absolute w-1 h-1 bg-yellow-400 rounded-full"
+                    className="absolute w-1 h-1 rounded-full"
+                    style={{ backgroundColor: '#E7F014' }}
                     animate={{ scale: [1, 1.5, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   />
@@ -78,13 +79,13 @@ const Footer = () => {
                     animate={{ rotate: 360 }}
                     transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                   />
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-yellow-400 rounded-full" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full" style={{ backgroundColor: '#E7F014' }} />
                 </div>
                 <span className="text-2xl font-[900] tracking-tighter text-black">mo</span>
               </div>
             </Link>
             
-            <p className="text-gray-500 text-base md:text-lg leading-relaxed max-w-sm">
+            <p className="text-base md:text-lg leading-relaxed max-w-sm text-black opacity-60">
               The fastest way to create property videos. Period. Just paste your link and let AI do the rest.
             </p>
             
@@ -93,7 +94,7 @@ const Footer = () => {
                 <a
                   key={i}
                   href={social.href}
-                  className="text-gray-400 hover:text-black transition-colors duration-300"
+                  className="text-black transition-colors duration-300 hover:opacity-100 opacity-60"
                 >
                   <social.icon className="w-5 h-5" />
                 </a>
@@ -113,7 +114,7 @@ const Footer = () => {
                     <li key={linkIdx}>
                       <Link
                         to={link.href}
-                        className="group flex items-center gap-1 text-gray-500 hover:text-black transition-all duration-200"
+                        className="group flex items-center gap-1 transition-all duration-200 text-black hover:opacity-100 opacity-60"
                       >
                         <span className="text-sm font-semibold">{link.name}</span>
                         <HiChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 -ml-1 transition-all" />
@@ -127,17 +128,17 @@ const Footer = () => {
         </div>
 
         {/* Bottom Tier */}
-        <div className="mt-16 md:mt-24 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-          <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 md:gap-6 text-xs font-bold text-gray-400 tracking-wider uppercase">
+        <div className="mt-16 md:mt-24 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left" style={{ borderTopColor: 'rgba(0, 0, 0, 0.1)' }}>
+          <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 md:gap-6 text-xs font-bold tracking-wider uppercase text-black opacity-60">
             <span>© 2025 loomo AI</span>
-            <div className="hidden md:block h-3 w-[1px] bg-gray-300" />
-            <a href="/status" className="flex items-center gap-2 hover:text-black transition-colors">
+            <div className="hidden md:block h-3 w-[1px] bg-black/10" />
+            <a href="/status" className="flex items-center gap-2 hover:opacity-100 transition-opacity">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               <span>Systems Online</span>
             </a>
           </div>
 
-          <p className="text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase italic">
+          <p className="text-[10px] font-bold tracking-[0.2em] uppercase italic text-black opacity-60">
             Made with love for Real Estate Agents
           </p>
         </div>

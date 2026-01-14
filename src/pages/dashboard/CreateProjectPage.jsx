@@ -54,9 +54,10 @@ const ANIMATION_SHOTS = [
 
 // Reusable animated line from DashboardHome
 const AnimatedLine = ({ className = "" }) => (
-	<div className={`h-[1px] bg-gray-200 overflow-hidden ${className}`}>
+	<div className={`h-[1px] bg-black/5 overflow-hidden ${className}`}>
 		<motion.div
-			className="w-1/3 h-full bg-yellow-400"
+			className="w-1/3 h-full"
+			style={{ backgroundColor: '#E7F014' }}
 			animate={{ x: ["-100%", "300%"] }}
 			transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
 		/>
@@ -125,7 +126,7 @@ const CreateProjectPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9f9f7] text-black font-['Plus_Jakarta_Sans',sans-serif] p-6 lg:p-12">
+    <div className="min-h-screen bg-[#F2F2ED] text-black p-6 lg:p-12" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
       <Helmet><title>New Project | VideoGen</title></Helmet>
 
       <div className="max-w-7xl mx-auto">
@@ -136,29 +137,29 @@ const CreateProjectPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="inline-block mb-4"
           >
-            <span className="bg-yellow-400 text-black font-black text-[10px] uppercase tracking-[0.2em] px-4 py-2">
+            <span className="text-black font-bold text-[10px] uppercase tracking-[0.2em] px-4 py-2" style={{ backgroundColor: '#E7F014' }}>
               Step {step} of 5
             </span>
           </motion.div>
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
-              <h1 className="text-4xl md:text-5xl font-black text-black tracking-tighter leading-none uppercase">
-                Video <span className="text-gray-400">Creation</span>
+              <h1 className="text-4xl md:text-6xl font-bold text-black leading-tight">
+                Video <span className="opacity-40">Creation</span>
               </h1>
-              <p className="text-gray-500 font-medium mt-4 tracking-tight">Follow the pipeline to generate your cinematic asset.</p>
+              <p className="text-black opacity-40 text-base mt-4">Follow the pipeline to generate your cinematic asset.</p>
             </div>
 
             {/* Step Indicators */}
-            <div className="flex bg-white p-1 border border-gray-100 shadow-sm rounded-lg overflow-hidden">
+            <div className="flex bg-white border border-black/5 shadow-sm rounded-lg overflow-hidden">
                {STEPS.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => step > s.id && setStep(s.id)}
                     className={cn(
                       "px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
-                      step === s.id ? "bg-black text-white" : 
-                      step > s.id ? "text-gray-800 hover:text-yellow-600" : "text-gray-300 pointer-events-none"
+                      step === s.id ? "bg-[#E7F014] text-black" : 
+                      step > s.id ? "text-black hover:bg-black/5" : "text-black opacity-20 pointer-events-none"
                     )}
                   >
                     <s.icon className="w-3.5 h-3.5" />
@@ -184,15 +185,15 @@ const CreateProjectPage = () => {
                   {...getRootProps()} 
                   className={cn(
                     "relative aspect-video rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center p-12 group cursor-pointer",
-                    isDragActive ? "border-yellow-400 bg-yellow-50" : "border-gray-200 bg-white hover:border-black"
+                    isDragActive ? "border-[#E7F014] bg-[#E7F014]/5" : "border-black/10 bg-white hover:border-black"
                   )}
                 >
                   <input {...getInputProps()} />
-                  <div className="w-16 h-16 bg-yellow-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <div className="w-16 h-16 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#E7F014' }}>
                     <HiPlus className="w-8 h-8 text-black" />
                   </div>
-                  <h3 className="text-xl font-black uppercase tracking-tight mb-2">Initialize Assets</h3>
-                  <p className="text-gray-400 text-sm font-medium">JPEG, PNG or WEBP. Max 20MB per asset.</p>
+                  <h3 className="text-xl font-bold mb-2 text-black">Initialize Assets</h3>
+                  <p className="text-black opacity-40 text-sm font-medium">JPEG, PNG or WEBP. Max 20MB per asset.</p>
                   
                   <AnimatedLine className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
@@ -200,7 +201,7 @@ const CreateProjectPage = () => {
                 {images.length > 0 && (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {images.map((img) => (
-                      <div key={img.id} className="relative group bg-white p-2 border border-gray-100 shadow-sm hover:shadow-lg transition-all">
+                      <div key={img.id} className="relative group bg-white p-2 border border-black/5 shadow-sm hover:shadow-lg transition-all">
                         <img src={img.preview} className="w-full h-32 object-cover" />
                         <button 
                           onClick={(e) => { e.stopPropagation(); removeImage(img.id); }}
@@ -214,32 +215,33 @@ const CreateProjectPage = () => {
                 )}
               </div>
 
-              <div className="lg:col-span-1">
-                 <div className="bg-black text-white p-8 space-y-8 group overflow-hidden relative">
+               <div className="lg:col-span-1">
+                 <div className="bg-white border border-black/5 p-8 space-y-8 group overflow-hidden relative shadow-2xl">
                     <div className="relative z-10">
-                      <div className="w-10 h-10 bg-yellow-400 flex items-center justify-center mb-6">
+                      <div className="w-10 h-10 flex items-center justify-center mb-6" style={{ backgroundColor: '#E7F014' }}>
                         <HiLightningBolt className="w-5 h-5 text-black" />
                       </div>
-                      <h3 className="text-xl font-bold mb-4 tracking-tight">Generation Brief</h3>
-                      <p className="text-gray-400 text-sm leading-relaxed mb-10">
+                      <h3 className="text-xl font-bold mb-4 text-black">Generation Brief</h3>
+                      <p className="text-black opacity-40 text-sm leading-relaxed mb-10">
                         Our AI analyzes resolution and depth to ensure optimal cinematic quality for each frame.
                       </p>
                       
-                      <div className="space-y-4 mb-10 text-xs font-black uppercase tracking-widest">
-                        <div className="flex justify-between border-b border-white/10 pb-3">
-                           <span className="text-gray-500">Staged</span>
+                      <div className="space-y-4 mb-10 text-xs font-black uppercase tracking-widest text-black">
+                        <div className="flex justify-between border-b border-black/5 pb-3">
+                           <span className="opacity-40">Staged</span>
                            <span>{images.length} Assets</span>
                         </div>
-                        <div className="flex justify-between border-b border-white/10 pb-3">
-                           <span className="text-gray-500">Quality</span>
-                           <span className="text-yellow-400">Auto-Check</span>
+                        <div className="flex justify-between border-b border-black/5 pb-3">
+                           <span className="opacity-40">Quality</span>
+                           <span className="text-[#E7F014]">Auto-Check</span>
                         </div>
                       </div>
 
                       <Button 
                         disabled={images.length < 3}
                         onClick={startAnalysis}
-                        className="w-full bg-yellow-400 text-black font-bold h-14 hover:bg-white transition-all flex items-center justify-center gap-2 group/btn"
+                        className="w-full text-black font-bold h-14 transition-all flex items-center justify-center gap-2 group/btn"
+                        variant="primary"
                       >
                         Start Pipeline <HiChevronRight className="group-hover/btn:translate-x-1 transition-transform" />
                       </Button>
@@ -266,12 +268,12 @@ const CreateProjectPage = () => {
                  />
                  <HiSparkles className="absolute inset-0 m-auto w-10 h-10 text-yellow-400 animate-pulse" />
                </div>
-               <h2 className="text-3xl font-black uppercase tracking-tighter mb-4">Deep Learning Analysis</h2>
-               <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-[10px] mb-12">Detecting cinematic vectors & motion depth</p>
+                <h2 className="text-3xl font-bold mb-4 text-black">Deep Learning Analysis</h2>
+                <p className="text-black opacity-40 font-bold uppercase tracking-[0.2em] text-[10px] mb-12">Detecting cinematic vectors & motion depth</p>
                
-               <div className="max-w-4xl mx-auto space-y-4">
-                  {images.map(img => (
-                    <div key={img.id} className="bg-white p-4 border border-gray-100 flex items-center justify-between group overflow-hidden relative">
+                <div className="max-w-4xl mx-auto space-y-4 text-black">
+                   {images.map(img => (
+                     <div key={img.id} className="bg-white p-4 border border-black/5 flex items-center justify-between group overflow-hidden relative">
                        <div className="flex items-center gap-4">
                           <img src={img.preview} className="w-10 h-10 object-cover" />
                           <span className="text-xs font-bold truncate max-w-[200px]">{img.file?.name}</span>
@@ -281,8 +283,8 @@ const CreateProjectPage = () => {
                              <span className="text-[10px] font-black uppercase text-green-500 flex items-center gap-1"><HiCheck /> Verified</span>
                           ) : (
                              <span className="text-[10px] font-black uppercase text-yellow-500 animate-pulse">Processing...</span>
-                          )}
-                          <div className="w-32 h-1 bg-gray-100 overflow-hidden">
+                           )}
+                           <div className="w-32 h-1 bg-black/5 overflow-hidden">
                              <motion.div 
                                 className="h-full bg-yellow-400"
                                 initial={{ width: 0 }}
@@ -305,44 +307,44 @@ const CreateProjectPage = () => {
                animate={{ opacity: 1 }} 
                className="space-y-8"
             >
-               <div className="flex items-center justify-between gap-4 mb-2">
-                  <h2 className="text-2xl font-black uppercase tracking-tight">Sequence Pipeline</h2>
-                  <div className="flex gap-4">
-                    <button onClick={() => setStep(1)} className="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors">Abort Stream</button>
-                    <button onClick={() => setStep(4)} className="bg-black text-white px-6 py-3 font-bold text-xs hover:bg-yellow-400 hover:text-black transition-all">Preview Output</button>
-                  </div>
-               </div>
+                <div className="flex items-center justify-between gap-4 mb-2 text-black">
+                   <h2 className="text-2xl font-bold">Sequence Pipeline</h2>
+                   <div className="flex gap-4">
+                     <button onClick={() => setStep(1)} className="text-xs font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-colors">Abort Stream</button>
+                     <Button onClick={() => setStep(4)} className="h-12">Preview Output</Button>
+                   </div>
+                </div>
 
-               <div className="flex gap-6 overflow-x-auto pb-8 snap-x">
-                  {timeline.map((clip, idx) => (
-                    <div key={clip.id} className="w-72 shrink-0 snap-start bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
-                       <img src={clip.preview} className="w-full h-40 object-cover" />
-                       <div className="p-6">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Frame 0{idx + 1}</p>
+                <div className="flex gap-6 overflow-x-auto pb-8 snap-x text-black">
+                   {timeline.map((clip, idx) => (
+                     <div key={clip.id} className="w-72 shrink-0 snap-start bg-white border border-black/5 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
+                        <img src={clip.preview} className="w-full h-40 object-cover" />
+                        <div className="p-6">
+                           <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-4">Frame 0{idx + 1}</p>
                           <div className="space-y-4">
-                             <div className="flex items-center justify-between text-xs font-bold">
-                                <span>Motion</span>
-                                <span className="text-yellow-600 uppercase tracking-tighter">{clip.animation}</span>
-                             </div>
-                             <select 
-                                value={clip.animation}
-                                onChange={(e) => updateClipAnimation(clip.id, e.target.value)}
-                                className="w-full bg-[#f9f9f7] p-3 text-xs font-bold outline-none border border-transparent focus:border-yellow-400 transition-colors"
-                             >
+                              <div className="flex items-center justify-between text-xs font-bold">
+                                 <span>Motion</span>
+                                 <span className="text-[#E7F014] uppercase tracking-tighter">{clip.animation}</span>
+                              </div>
+                              <select 
+                                 value={clip.animation}
+                                 onChange={(e) => updateClipAnimation(clip.id, e.target.value)}
+                                 className="w-full bg-[#f9f9f7] p-3 text-xs font-bold outline-none border border-transparent focus:border-[#E7F014] transition-colors appearance-none"
+                              >
                                 {ANIMATION_SHOTS.map(shot => (
                                    <option key={shot.id} value={shot.id}>{shot.name}</option>
                                 ))}
                              </select>
                           </div>
-                          <div className="mt-8 flex items-center justify-between border-t border-gray-50 pt-4">
-                             <div className="flex flex-col">
-                                <span className="text-[8px] font-black uppercase text-gray-300">Default Time</span>
-                                <span className="text-xs font-black">2.5s</span>
-                             </div>
-                             <div className="p-2 bg-gray-50 text-gray-300 group-hover:bg-yellow-100 group-hover:text-yellow-600 transition-colors cursor-grab">
-                                <HiSelector className="w-4 h-4" />
-                             </div>
-                          </div>
+                           <div className="mt-8 flex items-center justify-between border-t border-black/5 pt-4">
+                              <div className="flex flex-col">
+                                 <span className="text-[8px] font-black uppercase opacity-20">Default Time</span>
+                                 <span className="text-xs font-black">2.5s</span>
+                              </div>
+                              <div className="p-2 bg-black/5 text-black opacity-20 group-hover:bg-[#E7F014] group-hover:opacity-100 transition-colors cursor-grab">
+                                 <HiSelector className="w-4 h-4" />
+                              </div>
+                           </div>
                        </div>
                        <AnimatedLine className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100" />
                     </div>
@@ -374,12 +376,12 @@ const CreateProjectPage = () => {
                   </div>
                </div>
 
-               <div className="space-y-6">
-                  <div className="bg-white p-8 border border-gray-100 shadow-sm space-y-8">
-                     <h3 className="text-xl font-black uppercase tracking-tighter">Preview Master</h3>
-                     <p className="text-gray-400 text-sm leading-relaxed">
-                        Validation cycle completed. Sequence order and cinematic motion have been verified.
-                     </p>
+                <div className="space-y-6">
+                   <div className="bg-white p-8 border border-black/5 shadow-2xl space-y-8 text-black">
+                      <h3 className="text-xl font-bold">Preview Master</h3>
+                      <p className="text-black opacity-40 text-sm leading-relaxed">
+                         Validation cycle completed. Sequence order and cinematic motion have been verified.
+                      </p>
                      
                      <div className="space-y-3">
                         {['Depth Verified', 'Temporal Sync', 'Format Ready'].map(tag => (
@@ -392,40 +394,40 @@ const CreateProjectPage = () => {
                         ))}
                      </div>
 
-                     <div className="pt-8 space-y-3 border-t border-gray-50">
-                        <Button onClick={() => setStep(5)} className="w-full bg-black text-white h-14 font-bold hover:bg-yellow-400 hover:text-black transition-all">Proceed to Finalize</Button>
-                        <Button variant="ghost" onClick={() => setStep(3)} className="w-full text-xs font-black uppercase tracking-widest text-gray-400">Back to Timeline</Button>
-                     </div>
+                      <div className="pt-8 space-y-3 border-t border-black/5">
+                         <Button onClick={() => setStep(5)} className="w-full h-14">Proceed to Finalize</Button>
+                         <Button variant="ghost" onClick={() => setStep(3)} className="w-full">Back to Timeline</Button>
+                      </div>
                   </div>
                </div>
             </motion.div>
           )}
 
           {/* STEP 5: FINALIZE */}
-          {step === 5 && (
+             {step === 5 && (
             <motion.div 
                key="step5" 
                initial={{ opacity: 0, y: 20 }} 
                animate={{ opacity: 1, y: 0 }} 
-               className="grid lg:grid-cols-3 gap-8"
+               className="grid lg:grid-cols-3 gap-8 text-black"
             >
-               <div className="lg:col-span-2 bg-white p-10 border border-gray-100 shadow-sm space-y-12">
+               <div className="lg:col-span-2 bg-white p-10 border border-black/5 shadow-sm space-y-12">
                   <div className="grid md:grid-cols-2 gap-8">
                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Agent Identifier</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Agent Identifier</label>
                         <input 
                            value={settings.branding.agentName}
                            onChange={(e) => updateSettings({ branding: { ...settings.branding, agentName: e.target.value } })}
-                           className="w-full bg-[#f9f9f7] border-b-2 border-transparent focus:border-yellow-400 p-4 text-sm font-bold outline-none transition-all"
+                           className="w-full bg-[#f9f9f7] border-b-2 border-transparent focus:border-[#E7F014] p-4 text-sm font-bold outline-none transition-all text-black"
                            placeholder="Full Name"
                         />
                      </div>
                      <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Asset Location</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Asset Location</label>
                         <input 
                            value={settings.branding.propertyAddress}
                            onChange={(e) => updateSettings({ branding: { ...settings.branding, propertyAddress: e.target.value } })}
-                           className="w-full bg-[#f9f9f7] border-b-2 border-transparent focus:border-yellow-400 p-4 text-sm font-bold outline-none transition-all"
+                           className="w-full bg-[#f9f9f7] border-b-2 border-transparent focus:border-[#E7F014] p-4 text-sm font-bold outline-none transition-all text-black"
                            placeholder="Property Stream"
                         />
                      </div>
@@ -434,65 +436,65 @@ const CreateProjectPage = () => {
 
 
                   <div className="space-y-6">
-                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Communication Node</label>
+                     <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Communication Node</label>
                      <div className="flex gap-4">
                         <input 
                            value={settings.contact.value}
                            onChange={(e) => updateSettings({ contact: { ...settings.contact, value: e.target.value } })}
-                           className="flex-1 bg-[#f9f9f7] p-4 text-sm font-bold outline-none"
+                           className="flex-1 bg-[#f9f9f7] p-4 text-sm font-bold outline-none text-black"
                            placeholder="Signal Address"
                         />
                      </div>
                   </div>
                </div>
 
-               <div className="lg:col-span-1 space-y-6">
-                  <div className="bg-black text-white p-8 space-y-10 group relative overflow-hidden">
-                     <h3 className="text-xl font-bold tracking-tight mb-2">Deploy Stream</h3>
-                     
-                     <div className="space-y-4 text-[10px] font-black uppercase tracking-widest opacity-60">
-                        <div className="flex justify-between border-b border-white/5 pb-3">
-                           <span>Res</span>
-                           <span className="text-white">1080P MASTER</span>
-                        </div>
-                        <div className="flex justify-between border-b border-white/5 pb-3">
-                           <span>Container</span>
-                           <span className="text-white">MP4 / H.264</span>
-                        </div>
-                        <div className="flex justify-between border-b border-white/5 pb-3">
-                           <span>Cost</span>
-                           <span className="text-yellow-400 italic">1.0 CR</span>
-                        </div>
-                     </div>
+                <div className="lg:col-span-1 space-y-6 text-black">
+                   <div className="bg-white border border-black/5 p-8 space-y-10 group relative overflow-hidden shadow-2xl">
+                      <h3 className="text-xl font-bold mb-2">Deploy Stream</h3>
+                      
+                      <div className="space-y-4 text-[10px] font-black uppercase tracking-widest">
+                         <div className="flex justify-between border-b border-black/5 pb-3">
+                            <span className="opacity-40">Res</span>
+                            <span>1080P MASTER</span>
+                         </div>
+                         <div className="flex justify-between border-b border-black/5 pb-3">
+                            <span className="opacity-40">Container</span>
+                            <span>MP4 / H.264</span>
+                         </div>
+                         <div className="flex justify-between border-b border-black/5 pb-3">
+                            <span className="opacity-40">Cost</span>
+                            <span className="text-[#E7F014]">1.0 CR</span>
+                         </div>
+                      </div>
 
-                     <Button 
-                        onClick={() => {
-                          toast.promise(
-                            new Promise(resolve => setTimeout(resolve, 2000)),
-                            {
-                              loading: 'Synchronizing Stream...',
-                              success: 'Asset Deployed!',
-                              error: 'Deployment Failure'
-                            }
-                          );
-                          setTimeout(() => navigate('/dashboard/projects'), 2500);
-                        }}
-                        className="w-full bg-yellow-400 text-black h-16 font-bold hover:bg-white transition-all flex items-center justify-center gap-2 group/final"
-                     >
-                        Confirm Master <HiSparkles className="group-hover/final:rotate-12 transition-transform" />
-                     </Button>
+                      <Button 
+                         onClick={() => {
+                           toast.promise(
+                             new Promise(resolve => setTimeout(resolve, 2000)),
+                             {
+                               loading: 'Synchronizing Stream...',
+                               success: 'Asset Deployed!',
+                               error: 'Deployment Failure'
+                             }
+                           );
+                           setTimeout(() => navigate('/dashboard/projects'), 2500);
+                         }}
+                         className="w-full h-16"
+                      >
+                         Confirm Master <HiSparkles className="group-hover/final:rotate-12 transition-transform" />
+                      </Button>
                      <AnimatedLine className="absolute bottom-0 left-0 right-0" />
                   </div>
 
-                  <div className="bg-white p-6 border border-gray-100 flex items-center justify-between hover:bg-yellow-50 transition-all cursor-pointer group">
-                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-[#f9f9f7] flex items-center justify-center group-hover:bg-yellow-400 transition-colors">
-                           <HiDownload className="text-gray-400 group-hover:text-black" />
-                        </div>
-                        <span className="text-xs font-bold uppercase tracking-widest">Archive Sync</span>
-                     </div>
-                     <HiChevronRight className="text-gray-300 group-hover:text-black" />
-                  </div>
+                   <div className="bg-white p-6 border border-black/5 flex items-center justify-between hover:bg-black/5 transition-all cursor-pointer group shadow-sm text-black">
+                      <div className="flex items-center gap-4">
+                         <div className="w-10 h-10 bg-black/5 flex items-center justify-center group-hover:bg-[#E7F014] transition-colors">
+                            <HiDownload className="text-black opacity-20 group-hover:opacity-100 group-hover:text-black" />
+                         </div>
+                         <span className="text-xs font-bold uppercase tracking-widest">Archive Sync</span>
+                      </div>
+                      <HiChevronRight className="text-black opacity-20 group-hover:opacity-100 group-hover:text-black" />
+                   </div>
                </div>
             </motion.div>
           )}

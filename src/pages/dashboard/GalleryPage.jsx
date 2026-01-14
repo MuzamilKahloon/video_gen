@@ -15,7 +15,8 @@ import toast from "react-hot-toast";
 const AnimatedLine = ({ className = "" }) => (
   <div className={`h-[1px] bg-gray-200 overflow-hidden ${className}`}>
     <motion.div
-      className="w-1/3 h-full bg-yellow-400"
+      className="w-1/3 h-full"
+      style={{ backgroundColor: '#E7F014' }}
       animate={{ x: ["-100%", "300%"] }}
       transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
     />
@@ -24,11 +25,11 @@ const AnimatedLine = ({ className = "" }) => (
 
 const Button = ({ children, className = "", variant = "primary", ...props }) => {
   const variants = {
-    primary: "bg-black text-white hover:bg-yellow-400 hover:text-black shadow-xl hover:-translate-y-0.5 transition-all duration-300 font-bold disabled:opacity-50",
-    secondary: "bg-white border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 text-black font-bold",
-    ghost: "bg-gray-50 hover:bg-gray-100 text-gray-500 hover:text-black transition-all",
+    primary: "bg-[#E7F014] text-black hover:bg-black hover:text-white shadow-xl hover:-translate-y-0.5 transition-all duration-300 font-bold disabled:opacity-50",
+    secondary: "bg-white border border-black/10 shadow-sm hover:shadow-lg transition-all duration-300 text-black font-bold",
+    ghost: "bg-black/5 hover:bg-black/10 text-black opacity-40 hover:opacity-100 transition-all",
     black: "bg-black text-white hover:bg-black/90 transition-all font-bold",
-    danger: "bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-all font-bold",
+    danger: "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all font-bold",
     outline: "border-2 border-black text-black hover:bg-black hover:text-white transition-all font-bold"
   };
   return (
@@ -45,7 +46,7 @@ const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={onClose}>
       <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className={cn("bg-white w-full shadow-2xl relative overflow-hidden", sizes[size])} onClick={(e) => e.stopPropagation()}>
         <div className="p-8 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-xl font-black text-black tracking-tighter uppercase italic">{title}</h2>
+          <h2 className="text-xl font-bold text-black">{title}</h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 transition-colors text-gray-400 hover:text-black"><HiX className="w-6 h-6" /></button>
         </div>
         <div className="p-8">{children}</div>
@@ -185,12 +186,12 @@ const VideoCard = ({ video, viewMode, onPlay, onDownload, onDelete, onToggleFavo
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3">
-              <h3 className="font-black text-black tracking-tight uppercase truncate italic">{video.title}</h3>
+              <h3 className="font-bold text-black truncate">{video.title}</h3>
               {video.isFavorite && <HiHeart className="w-4 h-4 text-yellow-400" />}
             </div>
             <div className="flex items-center gap-4 mt-2">
-              <span className="bg-black text-white px-2 py-0.5 text-[8px] font-black uppercase tracking-widest leading-none">{video.template}</span>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{video.quality} • {video.aspectRatio}</span>
+              <span className="bg-[#E7F014] text-black px-2 py-0.5 text-[8px] font-black uppercase tracking-widest leading-none">{video.template}</span>
+              <span className="text-[10px] font-bold text-black opacity-40 uppercase tracking-widest">{video.quality} • {video.aspectRatio}</span>
             </div>
           </div>
           <div className="hidden md:flex flex-col items-end gap-1">
@@ -204,10 +205,10 @@ const VideoCard = ({ video, viewMode, onPlay, onDownload, onDelete, onToggleFavo
               <button onClick={() => setShowMenu(!showMenu)} className="p-3 bg-gray-50 hover:bg-black hover:text-white transition-all"><HiDotsVertical className="w-5 h-5" /></button>
               <AnimatePresence>
                 {showMenu && (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="absolute right-0 top-full mt-2 bg-black text-white w-48 shadow-2xl z-[60]">
-                    <Link to={`/dashboard/projects/${video.id}`} className="block px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-colors">Operational View</Link>
-                    <button onClick={() => { onDownload(video); setShowMenu(false); }} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-colors">Acquire Assets</button>
-                    <button onClick={() => { onDelete(video); setShowMenu(false); }} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest bg-red-900/50 hover:bg-red-600 transition-colors">Decommission</button>
+                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="absolute right-0 top-full mt-2 bg-white text-black w-48 shadow-2xl z-[60] border border-black/5">
+                    <Link to={`/dashboard/projects/${video.id}`} className="block px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-[#E7F014] transition-colors">Operational View</Link>
+                    <button onClick={() => { onDownload(video); setShowMenu(false); }} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-[#E7F014] transition-colors">Acquire Assets</button>
+                    <button onClick={() => { onDelete(video); setShowMenu(false); }} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors">Decommission</button>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -237,30 +238,30 @@ const VideoCard = ({ video, viewMode, onPlay, onDownload, onDelete, onToggleFavo
         </div>
         <div className="absolute top-4 left-4 flex gap-2">
            <input type="checkbox" checked={isSelected} onClick={(e) => e.stopPropagation()} onChange={() => onSelect(video.id)} className="w-5 h-5 accent-black rounded-none cursor-pointer" />
-           <span className="bg-black text-white px-2 py-0.5 text-[8px] font-black uppercase tracking-widest">{video.quality}</span>
+           <span className="bg-[#E7F014] text-black px-2 py-0.5 text-[8px] font-black uppercase tracking-widest">{video.quality}</span>
         </div>
-        <div className="absolute bottom-4 right-4 bg-black text-white px-2 py-1 text-[10px] font-black tracking-widest">{formatDuration(video.duration)}</div>
+        <div className="absolute bottom-4 right-4 bg-[#F2F2ED] text-black px-2 py-1 text-[10px] font-black tracking-widest">{formatDuration(video.duration)}</div>
         {video.isFavorite && <div className="absolute top-4 right-4 text-yellow-400"><HiHeart className="w-5 h-5" /></div>}
       </div>
       
       <div className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="text-lg font-black tracking-tighter uppercase italic text-black leading-tight truncate">{video.title}</h3>
+            <h3 className="text-lg font-bold text-black leading-tight truncate">{video.title}</h3>
             <div className="flex items-center gap-3 mt-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{video.template}</span>
-              <div className="w-1 h-1 bg-gray-200 rounded-full" />
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{formatRelativeTime(video.createdAt)}</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-black opacity-30">{video.template}</span>
+              <div className="w-1 h-1 bg-black/5 rounded-full" />
+              <span className="text-[10px] font-bold text-black opacity-30 uppercase tracking-widest">{formatRelativeTime(video.createdAt)}</span>
             </div>
           </div>
           <div className="relative">
              <button onClick={() => setShowMenu(!showMenu)} className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 transition-all"><HiDotsVertical className="w-5 h-5" /></button>
              <AnimatePresence>
                 {showMenu && (
-                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="absolute right-0 bottom-full mb-2 bg-black text-white w-48 shadow-2xl z-50 overflow-hidden">
-                    <Link to={`/dashboard/projects/${video.id}`} className="block px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-colors">Details</Link>
-                    <button onClick={() => onDownload(video)} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-colors">Download</button>
-                    <button onClick={() => onDelete(video)} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest bg-red-900/50 hover:bg-red-600 transition-colors">Decommission</button>
+                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="absolute right-0 bottom-full mb-2 bg-white text-black w-48 shadow-2xl z-[50] overflow-hidden border border-black/5">
+                    <Link to={`/dashboard/projects/${video.id}`} className="block px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-[#E7F014] transition-colors">Details</Link>
+                    <button onClick={() => onDownload(video)} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest hover:bg-[#E7F014] transition-colors">Download</button>
+                    <button onClick={() => onDelete(video)} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase tracking-widest bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors">Decommission</button>
                   </motion.div>
                 )}
              </AnimatePresence>
@@ -359,31 +360,31 @@ export default function GalleryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9f9f7] text-black font-['Plus_Jakarta_Sans',sans-serif] p-6 lg:p-12">
+    <div className="min-h-screen bg-[#F2F2ED] text-black p-6 lg:p-12" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
       <Helmet><title>Asset Archive - VideoGen AI</title></Helmet>
       
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 pb-12 border-b border-gray-200">
            <div>
-              <div className="flex items-center gap-4 mb-4">
-                 <span className="bg-black text-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]">Asset Archive</span>
-                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 italic font-medium">Repository Control</span>
-              </div>
-              <h1 className="text-4xl md:text-6xl font-black text-black tracking-tighter uppercase italic leading-none">
-                Deployment <br />Gallery
-              </h1>
+               <div className="flex items-center gap-4 mb-4">
+                  <span className="text-black px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]" style={{ backgroundColor: '#E7F014' }}>Asset Archive</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-black opacity-40">Repository Control</span>
+               </div>
+               <h1 className="text-4xl md:text-6xl font-bold text-black leading-tight">
+                 Deployment <span className="opacity-40">Gallery</span>
+               </h1>
            </div>
            
            <div className="flex flex-wrap items-center gap-8">
-              <div className="flex flex-col gap-1">
-                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total sequences</span>
-                 <span className="text-2xl font-black tracking-tight italic">{stats.total}</span>
-              </div>
-              <div className="flex flex-col gap-1">
-                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Storage used</span>
-                 <span className="text-2xl font-black tracking-tight italic">{formatFileSize(stats.totalSize)}</span>
-              </div>
+               <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest">Total sequences</span>
+                  <span className="text-2xl font-bold">{stats.total}</span>
+               </div>
+               <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-black text-black opacity-40 uppercase tracking-widest">Storage used</span>
+                  <span className="text-2xl font-bold">{formatFileSize(stats.totalSize)}</span>
+               </div>
               <Link to="/dashboard/projects/new">
                 <Button className="h-16 px-10">Initialize New Project <HiArrowRight className="w-5 h-5" /></Button>
               </Link>
@@ -393,24 +394,24 @@ export default function GalleryPage() {
         {/* Toolbar - Bento Style */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-12">
           {/* Search Box */}
-          <div className="lg:col-span-2 relative group bg-white border border-gray-100 p-2 flex items-center shadow-sm focus-within:border-yellow-400 transition-colors">
-            <HiSearch className="w-6 h-6 text-gray-300 ml-4" />
+          <div className="lg:col-span-2 relative group bg-white border border-black/5 p-2 flex items-center shadow-sm focus-within:border-[#E7F014] transition-colors">
+            <HiSearch className="w-6 h-6 text-black opacity-20 ml-4" />
             <input 
               type="text" 
               placeholder="Search by mission title..." 
               value={searchQuery} 
               onChange={(e) => setSearchQuery(e.target.value)} 
-              className="flex-1 bg-transparent p-4 outline-none text-sm font-bold placeholder:text-gray-200"
+              className="flex-1 bg-transparent p-4 outline-none text-sm font-bold placeholder:text-black/10 text-black"
             />
             <AnimatedLine className="absolute bottom-0 left-0 right-0 group-hover:opacity-100 opacity-0 transition-opacity" />
           </div>
 
           {/* Quick Filters */}
           <div className="flex bg-white border border-gray-100 p-2 shadow-sm">
-             <button onClick={() => setViewMode("grid")} className={cn("flex-1 flex items-center justify-center p-3 gap-2 transition-all", viewMode === "grid" ? "bg-black text-white" : "hover:bg-gray-50 text-gray-400")}>
+             <button onClick={() => setViewMode("grid")} className={cn("flex-1 flex items-center justify-center p-3 gap-2 transition-all", viewMode === "grid" ? "bg-black text-white" : "hover:bg-gray-50 text-black opacity-40 hover:opacity-100")}>
                <HiViewGrid className="w-5 h-5" />
              </button>
-             <button onClick={() => setViewMode("list")} className={cn("flex-1 flex items-center justify-center p-3 gap-2 transition-all", viewMode === "list" ? "bg-black text-white" : "hover:bg-gray-50 text-gray-400")}>
+             <button onClick={() => setViewMode("list")} className={cn("flex-1 flex items-center justify-center p-3 gap-2 transition-all", viewMode === "list" ? "bg-black text-white" : "hover:bg-gray-50 text-black opacity-40 hover:opacity-100")}>
                <HiViewList className="w-5 h-5" />
              </button>
           </div>
@@ -424,27 +425,27 @@ export default function GalleryPage() {
         {/* Extended Filters */}
         <AnimatePresence>
           {showFilters && (
-            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="mb-12 bg-black text-white p-8 relative overflow-hidden">
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="mb-12 bg-white border border-black/5 text-black p-8 relative overflow-hidden shadow-sm">
                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                   <div className="space-y-3">
-                     <label className="text-[10px] font-black uppercase tracking-widest text-white/40 flex items-center gap-2"><HiCube className="w-3 h-3" /> Template Type</label>
-                     <select value={filters.template} onChange={(e) => setFilters(prev => ({ ...prev, template: e.target.value }))} className="w-full bg-white/5 border border-white/10 p-4 outline-none focus:border-yellow-400 font-bold text-sm appearance-none">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-black/40 flex items-center gap-2"><HiCube className="w-3 h-3" /> Template Type</label>
+                     <select value={filters.template} onChange={(e) => setFilters(prev => ({ ...prev, template: e.target.value }))} className="w-full bg-[#F2F2ED] border border-black/5 p-4 outline-none focus:border-[#E7F014] font-bold text-sm appearance-none">
                         <option value="all">Archival Default</option>
                         <option value="cinematic">Cinematic</option><option value="dynamic">Dynamic</option>
                         <option value="elegant">Elegant</option><option value="property">Property</option>
                      </select>
                   </div>
                   <div className="space-y-3">
-                     <label className="text-[10px] font-black uppercase tracking-widest text-white/40 flex items-center gap-2"><HiExternalLink className="w-3 h-3" /> Quality Scale</label>
-                     <select value={filters.quality} onChange={(e) => setFilters(prev => ({ ...prev, quality: e.target.value }))} className="w-full bg-white/5 border border-white/10 p-4 outline-none focus:border-yellow-400 font-bold text-sm appearance-none">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-black/40 flex items-center gap-2"><HiExternalLink className="w-3 h-3" /> Quality Scale</label>
+                     <select value={filters.quality} onChange={(e) => setFilters(prev => ({ ...prev, quality: e.target.value }))} className="w-full bg-[#F2F2ED] border border-black/5 p-4 outline-none focus:border-[#E7F014] font-bold text-sm appearance-none">
                         <option value="all">All Resolutions</option>
                         <option value="720p">720P HD</option><option value="1080p">1080P FHD</option>
                         <option value="4k">4K UHD</option>
                      </select>
                   </div>
                   <div className="space-y-3">
-                     <label className="text-[10px] font-black uppercase tracking-widest text-white/40 flex items-center gap-2"><HiSortDescending className="w-3 h-3" /> Sequence Sort</label>
-                     <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full bg-white/5 border border-white/10 p-4 outline-none focus:border-yellow-400 font-bold text-sm appearance-none">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-black/40 flex items-center gap-2"><HiSortDescending className="w-3 h-3" /> Sequence Sort</label>
+                     <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-full bg-[#F2F2ED] border border-black/5 p-4 outline-none focus:border-[#E7F014] font-bold text-sm appearance-none">
                         <option value="newest">Recent Deployment</option>
                         <option value="oldest">Legacy Archives</option>
                         <option value="name">Alphanumeric (A-Z)</option>
@@ -452,11 +453,11 @@ export default function GalleryPage() {
                      </select>
                   </div>
                   <div className="flex flex-col justify-end">
-                     <button onClick={clearFilters} className="w-full py-4 bg-yellow-400 text-black font-black uppercase text-[10px] tracking-widest hover:bg-white transition-colors">Reset Archive Parameters</button>
+                     <button onClick={clearFilters} className="w-full py-4 bg-[#E7F014] text-black font-black uppercase text-[10px] tracking-widest hover:bg-black hover:text-white transition-colors">Reset Archive Parameters</button>
                   </div>
                </div>
-               <div className="mt-8 pt-8 border-t border-white/10 flex items-center gap-6">
-                  <button onClick={() => setFilters(prev => ({ ...prev, showFavoritesOnly: !prev.showFavoritesOnly }))} className={cn("flex items-center gap-3 px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all", filters.showFavoritesOnly ? "bg-yellow-400 text-black border-yellow-400" : "text-white/40 border-white/10 hover:border-white/40")}>
+               <div className="mt-8 pt-8 border-t border-black/5 flex items-center gap-6">
+                  <button onClick={() => setFilters(prev => ({ ...prev, showFavoritesOnly: !prev.showFavoritesOnly }))} className={cn("flex items-center gap-3 px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all", filters.showFavoritesOnly ? "bg-[#E7F014] text-black border-[#E7F014]" : "text-black opacity-40 border-black/10 hover:border-black/40 hover:opacity-100")}>
                     <HiHeart className="w-4 h-4" /> Priority Assets Only
                   </button>
                </div>
@@ -468,21 +469,21 @@ export default function GalleryPage() {
         {/* Bulk Control Bar */}
         <AnimatePresence>
           {selectedVideos.length > 0 && (
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[100] w-full max-w-2xl px-6">
-              <div className="bg-black text-white p-6 shadow-[0_40px_100px_rgba(0,0,0,0.5)] flex items-center justify-between gap-8 border border-white/10 relative">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[100] w-full max-w-2xl px-6">
+              <div className="bg-white text-black p-6 shadow-[0_40px_100px_rgba(0,0,0,0.1)] flex items-center justify-between gap-8 border border-black/5 relative overflow-hidden">
                 <div className="flex items-center gap-6">
-                  <div className="w-12 h-12 bg-yellow-400 text-black flex items-center justify-center font-black italic shadow-xl">{selectedVideos.length}</div>
+                  <div className="w-12 h-12 text-black flex items-center justify-center font-bold shadow-xl" style={{ backgroundColor: '#E7F014' }}>{selectedVideos.length}</div>
                   <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-white/40">Active Selection</h4>
-                    <button onClick={handleSelectAll} className="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-400 hover:text-white transition-colors">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-black opacity-30">Active Selection</h4>
+                    <button onClick={handleSelectAll} className="text-[10px] font-black uppercase tracking-[0.2em] text-black hover:opacity-60 transition-colors">
                       {selectedVideos.length === filteredVideos.length ? "Clear Archive Selection" : "Claim Remaining Assets"}
                     </button>
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <button className="flex items-center gap-2 p-4 bg-white/5 hover:bg-white/10 transition-all text-xs font-black uppercase tracking-widest"><HiDownload /> Batch Export</button>
-                  <button className="flex items-center gap-2 p-4 bg-red-900/50 hover:bg-red-600 transition-all text-xs font-black uppercase tracking-widest"><HiTrash /> Decommission</button>
-                  <button onClick={() => setSelectedVideos([])} className="p-4 bg-white/5 hover:bg-white/10 transition-all"><HiX /></button>
+                  <button className="flex items-center gap-2 p-4 bg-[#F2F2ED] hover:bg-[#E7F014] transition-all text-xs font-black uppercase tracking-widest"><HiDownload /> Batch Export</button>
+                  <button className="flex items-center gap-2 p-4 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all text-xs font-black uppercase tracking-widest"><HiTrash /> Decommission</button>
+                  <button onClick={() => setSelectedVideos([])} className="p-4 bg-black/5 hover:bg-black/10 transition-all text-black"><HiX /></button>
                 </div>
                 <AnimatedLine className="absolute top-0 left-0 right-0" />
               </div>
@@ -498,9 +499,9 @@ export default function GalleryPage() {
             ))}
           </div>
         ) : filteredVideos.length === 0 ? (
-          <div className="bg-white border border-gray-100 p-32 text-center relative group">
-            <h3 className="text-4xl font-black tracking-tighter uppercase italic mb-4">No Archives Found</h3>
-            <p className="text-gray-400 font-medium mb-12">Deployment repository empty for current operational parameters.</p>
+          <div className="bg-white border border-black/5 p-32 text-center relative group shadow-sm">
+            <h3 className="text-4xl font-bold mb-4 text-black">No Archives Found</h3>
+            <p className="text-black opacity-40 font-medium mb-12">Deployment repository empty for current operational parameters.</p>
             <Button onClick={clearFilters} variant="outline" className="mx-auto">Recalibrate Archive Filters</Button>
             <AnimatedLine className="absolute bottom-0 left-0 right-0" />
           </div>
@@ -521,22 +522,22 @@ export default function GalleryPage() {
                <div className="bg-black aspect-video relative group overflow-hidden">
                   <video src={activeVideo?.videoUrl} poster={activeVideo?.thumbnail} controls autoPlay className="w-full h-full object-contain" />
                   <div className="absolute top-6 right-6 flex items-center gap-3">
-                     <span className="bg-yellow-400 text-black px-3 py-1 text-[10px] font-black uppercase tracking-widest shadow-xl">Original asset</span>
+                     <span className="bg-[#E7F014] text-black px-3 py-1 text-[10px] font-black uppercase tracking-widest shadow-xl">Original asset</span>
                   </div>
                </div>
                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pt-4">
                   <div className="flex gap-12">
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Configuration</span>
-                        <span className="text-lg font-black tracking-tighter uppercase italic">{activeVideo?.template}</span>
+                        <span className="text-[10px] font-black text-black opacity-30 uppercase tracking-widest mb-1">Configuration</span>
+                         <span className="text-lg font-bold text-black">{activeVideo?.template}</span>
                      </div>
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Resolution</span>
-                        <span className="text-lg font-black tracking-tighter uppercase italic">{activeVideo?.quality}</span>
+                        <span className="text-[10px] font-black text-black opacity-30 uppercase tracking-widest mb-1">Resolution</span>
+                         <span className="text-lg font-bold text-black">{activeVideo?.quality}</span>
                      </div>
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Deployment</span>
-                        <span className="text-lg font-black tracking-tighter uppercase italic">{formatRelativeTime(activeVideo?.createdAt)}</span>
+                        <span className="text-[10px] font-black text-black opacity-30 uppercase tracking-widest mb-1">Deployment</span>
+                         <span className="text-lg font-bold text-black">{formatRelativeTime(activeVideo?.createdAt)}</span>
                      </div>
                   </div>
                   <div className="flex gap-4">
@@ -555,10 +556,10 @@ export default function GalleryPage() {
             <div className="w-24 h-24 bg-red-50 text-red-600 rounded-none flex items-center justify-center mx-auto border border-red-100 shadow-xl">
                <HiTrash className="w-10 h-10" />
             </div>
-            <div>
-               <h3 className="text-2xl font-black tracking-tighter uppercase italic mb-2">Permanent Removal</h3>
-               <p className="text-gray-500 font-medium">Attempting to decommission archive <span className="text-black font-extrabold">{videoToDelete?.title}</span>. This operational action is irreversible.</p>
-            </div>
+             <div>
+                <h3 className="text-2xl font-bold mb-2 text-black">Permanent Removal</h3>
+                <p className="text-black opacity-60 font-medium">Attempting to decommission archive <span className="text-black font-extrabold">{videoToDelete?.title}</span>. This operational action is irreversible.</p>
+             </div>
             <div className="grid grid-cols-2 gap-4">
                <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Abort Task</Button>
                <Button onClick={confirmDelete} className="bg-red-600 hover:bg-black text-white hover:text-white border-none">Execute</Button>

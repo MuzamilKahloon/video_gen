@@ -20,7 +20,8 @@ import {
 const AnimatedLine = ({ className = "" }) => (
   <div className={`h-[1px] bg-gray-200 overflow-hidden ${className}`}>
     <motion.div
-      className="w-1/3 h-full bg-yellow-400"
+      className="w-1/3 h-full"
+      style={{ backgroundColor: '#E7F014' }}
       animate={{ x: ["-100%", "300%"] }}
       transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
     />
@@ -59,7 +60,7 @@ const PricingPage = () => {
       popular: true,
       icon: HiLightningBolt,
       description: "The most popular choice for professional agents.",
-      color: "bg-yellow-400",
+      color: "style-yellow",
       features: [
         "70 credits per month",
         "Luma + Backup AI",
@@ -79,8 +80,7 @@ const PricingPage = () => {
       popular: false,
       icon: HiStar,
       description: "For high-volume users needing maximum quality.",
-      color: "bg-black",
-      textColor: "text-white",
+      color: "bg-[#F2F2ED]",
       features: [
         "160 credits per month",
         "Veo 3 AI Engine",
@@ -140,7 +140,7 @@ const PricingPage = () => {
   ];
 
   return (
-    <div className="w-full overflow-hidden font-['Plus_Jakarta_Sans',sans-serif] bg-white text-black">
+    <div className="w-full overflow-hidden bg-white text-black" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
       {/* Hero Section */}
       <section className="pt-32 pb-16 md:pt-48 md:pb-24 px-4 bg-white">
         <div className="max-w-5xl mx-auto text-center">
@@ -149,25 +149,20 @@ const PricingPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="inline-block mb-6"
           >
-            <span className="bg-yellow-400 text-black font-bold text-[10px] uppercase tracking-[0.2em] px-4 py-2">
+            <span className="text-black font-bold text-[10px] uppercase tracking-[0.2em] px-4 py-2" style={{ backgroundColor: '#E7F014' }}>
               Transparent Pricing
             </span>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl md:text-7xl font-bold mb-8 leading-tight tracking-tighter"
-          >
-            Scale your production<br />without the overhead
-          </motion.h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 md:mb-6 leading-tight">
+              Scale your production<br />without the overhead
+            </h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-lg md:text-xl text-gray-500 mb-12 max-w-2xl mx-auto leading-relaxed"
+            className="text-base mb-8 max-w-2xl mx-auto text-black opacity-60"
           >
             Choose a plan that fits your volume. Start for free and upgrade as your real estate business grows.
           </motion.p>
@@ -182,15 +177,17 @@ const PricingPage = () => {
             <span className={`text-sm font-bold ${billingCycle === 'monthly' ? 'text-black' : 'text-gray-400'}`}>Monthly</span>
             <button 
               onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'annual' : 'monthly')}
-              className="w-14 h-8 bg-black p-1 transition-all duration-300"
+              className="w-14 h-8 p-1 transition-all duration-300 rounded-full"
+              style={{ backgroundColor: '#F2F2ED' }}
             >
               <motion.div 
                 animate={{ x: billingCycle === 'monthly' ? 0 : 24 }}
-                className="w-6 h-6 bg-yellow-400"
+                className="w-6 h-6 rounded-full"
+                style={{ backgroundColor: '#E7F014' }}
               />
             </button>
             <span className={`text-sm font-bold ${billingCycle === 'annual' ? 'text-black' : 'text-gray-400'}`}>
-              Annual <span className="text-yellow-500 ml-1 text-xs font-black">SAVE 20%</span>
+              Annual <span className="ml-1 text-xs font-black" style={{ color: '#E7F014' }}>SAVE 20%</span>
             </span>
           </motion.div>
         </div>
@@ -209,33 +206,39 @@ const PricingPage = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className={`relative p-10 md:p-12 h-full flex flex-col ${plan.color} ${plan.textColor || 'text-black'} shadow-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2`}
+                  className={`relative p-10 md:p-12 h-full flex flex-col text-black shadow-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2`}
+                  style={{ backgroundColor: plan.color === 'style-yellow' ? '#E7F014' : plan.color === 'bg-[#F2F2ED]' ? '#F2F2ED' : '#FFFFFF' }}
                 >
                   {plan.popular && (
-                    <div className="absolute top-0 right-0 bg-black text-yellow-400 font-black text-[10px] uppercase tracking-widest px-4 py-2">
+                    <div className="absolute top-0 right-0 font-black text-[10px] uppercase tracking-widest px-4 py-3" style={{ backgroundColor: '#E7F014', color: 'black' }}>
                       Most Popular
                     </div>
                   )}
                   
                   <div className="mb-8">
-                    <plan.icon className={`w-12 h-12 ${plan.color === 'bg-black' ? 'text-yellow-400' : 'text-black'}`} />
+                    <plan.icon className="w-12 h-12 text-black" />
                   </div>
                   
-                  <h3 className="text-2xl md:text-3xl font-bold mb-2 tracking-tight">
+                  <h3 className="text-2xl font-bold mb-2">
                     {plan.name}
                   </h3>
 
                   <div className="flex items-baseline gap-1 mb-6">
-                    <span className="text-4xl md:text-5xl font-black tracking-tighter">${price}</span>
+                    <span className="text-4xl md:text-5xl font-black tracking-tight">${price}</span>
                     <span className="text-sm font-bold opacity-60">/mo</span>
                   </div>
                   
-                  <p className={`mb-8 opacity-80 text-sm leading-relaxed ${plan.color === 'bg-black' ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <p className="mb-8 text-black opacity-60 text-sm leading-relaxed">
                     {plan.description}
                   </p>
 
                   <div className="mb-10">
-                    <button className={`w-full py-4 font-black transition-all ${plan.color === 'bg-black' ? 'bg-yellow-400 text-black hover:bg-yellow-500' : 'bg-black text-white hover:bg-gray-800'}`}>
+                    <button 
+                      className="w-full py-4 font-black transition-all text-black hover:opacity-80"
+                      style={{ 
+                        backgroundColor: '#E7F014'
+                      }}
+                    >
                       SELECT PLAN →
                     </button>
                   </div>
@@ -262,13 +265,13 @@ const PricingPage = () => {
       {/* Comparison Section */}
       <section className="py-20 md:py-32 px-4 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-yellow-400 p-8 md:p-20 relative overflow-hidden">
+          <div className="p-8 md:p-20 relative overflow-hidden" style={{ backgroundColor: '#E7F014' }}>
             <div className="relative z-10">
               <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12">
-                <h2 className="text-3xl md:text-5xl font-black mb-6 md:mb-0 max-w-xl tracking-tight leading-tight">
+                <h2 className="text-2xl md:text-4xl font-bold text-black mb-6 max-w-xl leading-tight">
                   Detailed Feature Comparison
                 </h2>
-                <div className="bg-black text-yellow-400 font-bold text-[10px] uppercase tracking-wider px-4 py-2">
+                <div className="font-bold text-[10px] uppercase tracking-wider px-4 py-2" style={{ backgroundColor: '#E7F014', color: 'black' }}>
                   Full Catalog
                 </div>
               </div>
@@ -280,7 +283,7 @@ const PricingPage = () => {
                       <th className="py-6 font-black uppercase text-xs tracking-widest p-4">Feature</th>
                       <th className="py-6 font-black uppercase text-xs tracking-widest p-4">Starter</th>
                       <th className="py-6 font-black uppercase text-xs tracking-widest p-4">Creator</th>
-                      <th className="py-6 font-black uppercase text-xs tracking-widest p-4 text-white">Pro</th>
+                      <th className="py-6 font-black uppercase text-xs tracking-widest p-4" style={{ color: '#000000' }}>Pro</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-black/5">
@@ -319,10 +322,10 @@ const PricingPage = () => {
                 whileHover={{ y: -10 }}
                 className="bg-white p-10 shadow-sm border border-gray-100 text-center"
               >
-                <div className="w-12 h-12 bg-yellow-400 flex items-center justify-center mb-6 mx-auto">
+                <div className="w-12 h-12 flex items-center justify-center mb-6 mx-auto" style={{ backgroundColor: '#E7F014' }}>
                   <stat.icon className="w-6 h-6 text-black" />
                 </div>
-                <div className="text-4xl font-black mb-2 tracking-tighter">{stat.value}</div>
+                <div className="text-2xl md:text-4xl font-bold mb-2">{stat.value}</div>
                 <div className="text-xs font-bold uppercase tracking-widest text-gray-400">{stat.label}</div>
               </motion.div>
             ))}
@@ -333,22 +336,22 @@ const PricingPage = () => {
       {/* FAQ Section */}
       <section className="py-20 md:py-32 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-6xl font-black mb-6 tracking-tighter">Everything else</h2>
-            <div className="w-24 h-2 bg-yellow-400 mx-auto" />
+          <div className="text-center mb-16 md:mb-24">
+            <h2 className="text-2xl md:text-4xl font-bold mb-6">Everything else</h2>
+            <div className="w-24 h-2 mx-auto" style={{ backgroundColor: '#E7F014' }} />
           </div>
 
           <div className="space-y-4">
             {faqs.map((faq, index) => (
               <motion.div
                 key={index}
-                className="border-2 border-gray-100 overflow-hidden"
+                className="border-b border-gray-100 overflow-hidden"
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}
                   className="w-full flex items-center justify-between p-6 md:p-8 text-left hover:bg-gray-50 transition-colors"
                 >
-                  <span className="text-lg font-black tracking-tight">{faq.question}</span>
+                  <span className="text-lg font-bold text-black">{faq.question}</span>
                   <HiArrowRight className={`w-5 h-5 transition-transform duration-300 ${openFaq === index ? 'rotate-90' : ''}`} />
                 </button>
                 <AnimatePresence>
@@ -359,7 +362,7 @@ const PricingPage = () => {
                       exit={{ height: 0 }}
                       className="px-6 md:px-8 pb-8"
                     >
-                      <p className="text-gray-500 font-medium leading-relaxed">{faq.answer}</p>
+                      <p className="text-base font-medium leading-relaxed text-black opacity-60">{faq.answer}</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -370,7 +373,7 @@ const PricingPage = () => {
       </section>
 
       {/* Simplified CTA Section */}
-      <section className="py-24 md:py-32 px-4 bg-black text-white">
+      <section className="py-24 md:py-32 px-4" style={{ backgroundColor: '#F2F2ED' }}>
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -378,23 +381,23 @@ const PricingPage = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
-              Ready to transform your <span className="text-yellow-400">real estate marketing?</span>
+            <h2 className="text-2xl md:text-4xl font-bold text-black mb-4 md:mb-6 leading-tight">
+              Ready to transform your <span className="opacity-40">real estate marketing?</span>
             </h2>
-            <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base mb-8 max-w-2xl mx-auto text-black opacity-60">
               Join thousands of agents using loomo to create stunning AI videos in seconds. No credit card required to start.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="w-full sm:w-auto px-10 py-5 bg-yellow-400 text-black font-bold hover:bg-yellow-500 transition-all">
+              <button className="w-full sm:w-auto px-10 py-5 text-black font-bold transition-all shadow-xl hover:-translate-y-1" style={{ backgroundColor: '#E7F014' }}>
                 Get Started Free →
               </button>
-              <button className="w-full sm:w-auto px-10 py-5 border border-white/20 text-white font-bold hover:bg-white hover:text-black transition-all">
+              <button className="w-full sm:w-auto px-10 py-5 border-2 text-black font-bold hover:opacity-80 transition-all" style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
                 Contact Sales
               </button>
             </div>
 
-            <p className="mt-10 text-gray-500 text-sm font-medium">
+            <p className="mt-10 font-medium text-sm uppercase tracking-widest text-black opacity-40">
               25 Credits Free • No Subscription Required • Cancel Anytime
             </p>
           </motion.div>

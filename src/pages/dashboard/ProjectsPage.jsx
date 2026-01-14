@@ -13,9 +13,10 @@ import { formatRelativeTime } from "@utils/formatters";
 
 // Signature animated line
 const AnimatedLine = ({ className = "" }) => (
-  <div className={`h-[1px] bg-gray-200 overflow-hidden ${className}`}>
+  <div className={`h-[1px] bg-black/5 overflow-hidden ${className}`}>
     <motion.div
-      className="w-1/3 h-full bg-yellow-400"
+      className="w-1/3 h-full"
+      style={{ backgroundColor: '#E7F014' }}
       animate={{ x: ["-100%", "300%"] }}
       transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
     />
@@ -24,10 +25,10 @@ const AnimatedLine = ({ className = "" }) => (
 
 const Button = ({ children, className = "", variant = "primary", ...props }) => {
   const variants = {
-    primary: "bg-black text-white hover:bg-yellow-400 hover:text-black transition-all duration-300 font-bold",
-    secondary: "bg-white border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 text-black font-bold",
-    ghost: "bg-[#f9f9f7] hover:bg-gray-100 text-gray-500 hover:text-black transition-all font-bold",
-    danger: "bg-red-50 hover:bg-red-600 hover:text-white transition-all font-bold"
+    primary: "bg-[#E7F014] text-black hover:bg-black hover:text-white transition-all duration-300 font-bold",
+    secondary: "bg-white border border-black/10 shadow-sm hover:shadow-lg transition-all duration-300 text-black font-bold",
+    ghost: "bg-black/5 hover:bg-black/10 text-black opacity-40 hover:opacity-100 transition-all font-bold",
+    danger: "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all font-bold"
   };
   return (
     <button className={cn("px-6 py-3 flex items-center justify-center gap-2 uppercase text-[10px] tracking-widest", variants[variant], className)} {...props}>
@@ -48,9 +49,9 @@ const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
         className={cn("bg-white shadow-2xl w-full overflow-hidden", sizes[size])} 
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-8 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-xl font-black tracking-tight text-black uppercase">{title}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 transition-colors text-gray-400">
+        <div className="p-8 border-b border-black/5 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-black">{title}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-black/5 transition-colors text-black/40 hover:text-black">
             <HiXCircle className="w-5 h-5" />
           </button>
         </div>
@@ -132,23 +133,23 @@ export default function ProjectsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f9f9f7] text-black font-['Plus_Jakarta_Sans',sans-serif] p-6 lg:p-12">
+    <div className="min-h-screen bg-[#F2F2ED] text-black p-6 lg:p-12" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
       <Helmet><title>Repository | VideoGen AI</title></Helmet>
       
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-16">
           <div className="flex items-center gap-3 mb-4">
-            <span className="bg-yellow-400 text-black px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]">Asset Repository</span>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Total Deployments: {projects.length}</span>
+            <span className="text-black px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em]" style={{ backgroundColor: '#E7F014' }}>Asset Repository</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-black opacity-40">Total Deployments: {projects.length}</span>
           </div>
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
-              <h1 className="text-4xl md:text-5xl font-black text-black tracking-tighter leading-none mb-4 uppercase">
-                Active <span className="text-gray-300">Workspace</span>
+              <h1 className="text-4xl md:text-6xl font-bold text-black leading-tight mb-4 md:mb-6">
+                Active <span className="opacity-40">Workspace</span>
               </h1>
-              <p className="text-lg text-gray-500 max-w-xl leading-relaxed font-medium">
+              <p className="text-black opacity-60 text-base max-w-xl">
                 Manage your cinematic output stream and track high-bandwidth assets.
               </p>
             </div>
@@ -164,21 +165,21 @@ export default function ProjectsPage() {
 
         {/* Filters Bento Block */}
         <div className="grid lg:grid-cols-4 gap-6 mb-12">
-          <div className="lg:col-span-3 bg-white p-6 border border-gray-100 shadow-sm relative group overflow-hidden">
+          <div className="lg:col-span-3 bg-white p-6 border border-black/5 shadow-sm relative group overflow-hidden">
             <div className="relative z-10 flex items-center">
-              <HiSearch className="w-5 h-5 text-gray-400 mr-4" />
+              <HiSearch className="w-5 h-5 text-black opacity-30 mr-4" />
               <input
                 type="text"
                 placeholder="Search deployment nodes..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent border-none outline-none text-black font-bold placeholder:text-gray-300 text-lg uppercase tracking-tight"
+                className="flex-1 bg-transparent border-none outline-none text-black font-bold placeholder:text-black/20 text-lg uppercase tracking-tight"
               />
             </div>
             <AnimatedLine className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           
-          <div className="bg-white p-6 border border-gray-100 shadow-sm relative group">
+          <div className="bg-white p-6 border border-black/5 shadow-sm relative group">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
@@ -191,16 +192,16 @@ export default function ProjectsPage() {
               <option value="failed">Failed</option>
             </select>
             <div className="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none">
-              <HiArrowRight className="w-4 h-4 text-gray-400" />
+              <HiArrowRight className="w-4 h-4 text-black opacity-20" />
             </div>
           </div>
         </div>
 
         {/* Projects Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-black">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white border border-gray-100 h-80 animate-pulse" />
+              <div key={i} className="bg-white border border-black/5 h-80 animate-pulse" />
             ))}
           </div>
         ) : filteredProjects.length > 0 ? (
@@ -211,10 +212,10 @@ export default function ProjectsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 group relative overflow-hidden flex flex-col h-full"
+                className="bg-white border border-black/5 shadow-sm hover:shadow-xl transition-all duration-500 group relative overflow-hidden flex flex-col h-full"
               >
                 {/* Thumbnail Layer */}
-                <div className="aspect-video bg-[#f9f9f7] relative overflow-hidden">
+                <div className="aspect-video bg-[#F2F2ED] relative overflow-hidden">
                   {project.thumbnailUrl ? (
                     <img
                       src={project.thumbnailUrl}
@@ -223,7 +224,7 @@ export default function ProjectsPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <HiCube className="w-12 h-12 text-gray-200" />
+                      <HiCube className="w-12 h-12 text-black opacity-5" />
                     </div>
                   )}
                   
@@ -233,7 +234,7 @@ export default function ProjectsPage() {
                   
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                     <Link to={`/dashboard/projects/${project._id}`}>
-                      <button className="w-12 h-12 bg-yellow-400 text-black flex items-center justify-center hover:scale-110 transition-transform">
+                      <button className="w-12 h-12 text-black flex items-center justify-center hover:scale-110 transition-transform" style={{ backgroundColor: '#E7F014' }}>
                         <HiEye className="w-6 h-6" />
                       </button>
                     </Link>
@@ -244,25 +245,25 @@ export default function ProjectsPage() {
                 <div className="p-8 flex-1 flex flex-col justify-between relative">
                   <div>
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 bg-[#f9f9f7] flex items-center justify-center group-hover:bg-yellow-400 transition-colors">
-                           <HiLightningBolt className="w-4 h-4 text-gray-400 group-hover:text-black" />
+                        <div className="w-8 h-8 bg-[#F2F2ED] flex items-center justify-center transition-colors hover:bg-[#E7F014]">
+                           <HiLightningBolt className="w-4 h-4 text-black opacity-30 group-hover:text-black" />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300">{project.template || "Standard"}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-black opacity-30">{project.template || "Standard"}</span>
                     </div>
 
                     <Link to={`/dashboard/projects/${project._id}`}>
-                      <h3 className="text-xl font-black text-black tracking-tighter mb-4 uppercase group-hover:text-yellow-600 transition-colors line-clamp-1">
+                      <h3 className="text-xl font-bold text-black mb-4 line-clamp-1">
                         {project.title || "Untitled Sequence"}
                       </h3>
                     </Link>
 
-                    <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-black opacity-40">
                        <span className="flex items-center gap-1.5"><HiClock className="w-3.5 h-3.5" /> {formatRelativeTime(project.createdAt)}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-8 mt-8 border-t border-gray-50">
-                    <Link to={`/dashboard/projects/${project._id}`} className="text-[10px] font-black uppercase tracking-widest hover:text-black transition-colors flex items-center gap-2">
+                  <div className="flex items-center justify-between pt-8 mt-8 border-t border-black/5">
+                     <Link to={`/dashboard/projects/${project._id}`} className="text-[10px] font-bold uppercase tracking-widest text-black opacity-40 hover:opacity-100 transition-colors flex items-center gap-2">
                        Inspect Stream <HiArrowRight className="w-3.5 h-3.5" />
                     </Link>
                     <button 
@@ -270,7 +271,7 @@ export default function ProjectsPage() {
                         setProjectToDelete(project);
                         setDeleteModalOpen(true);
                       }}
-                      className="p-2 text-gray-200 hover:text-red-600 transition-colors"
+                      className="p-2 text-black opacity-20 hover:text-red-600 hover:opacity-100 transition-colors"
                     >
                       <HiTrash className="w-5 h-5" />
                     </button>
@@ -282,14 +283,14 @@ export default function ProjectsPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white border border-gray-100 py-32 text-center relative overflow-hidden group">
-            <div className="w-16 h-16 bg-[#f9f9f7] flex items-center justify-center mx-auto mb-8 group-hover:bg-yellow-400 transition-colors text-gray-300 group-hover:text-black">
+          <div className="bg-white border border-black/5 py-32 text-center relative overflow-hidden group text-black">
+            <div className="w-16 h-16 bg-black/5 flex items-center justify-center mx-auto mb-8 group-hover:bg-[#E7F014] transition-colors text-black opacity-20 group-hover:opacity-100">
               <HiFolder className="w-8 h-8" />
             </div>
-            <h3 className="text-2xl font-black tracking-tight mb-4 uppercase">
+            <h3 className="text-2xl font-bold mb-4">
               {searchQuery ? "No matching assets" : "Stream Offline"}
             </h3>
-            <p className="text-gray-400 font-medium mb-12 max-w-sm mx-auto text-sm">
+            <p className="text-black opacity-40 font-medium mb-12 max-w-sm mx-auto text-sm">
               {searchQuery
                 ? "Your search query returned no active cinematic deployments."
                 : "No cinematic assets detected in your current workspace stream."}
@@ -315,8 +316,8 @@ export default function ProjectsPage() {
                 <div className="w-16 h-16 bg-red-50 flex items-center justify-center mx-auto mb-6">
                   <HiTrash className="w-8 h-8 text-red-600" />
                 </div>
-                <h3 className="text-2xl font-black tracking-tight mb-2 uppercase">Terminate Asset?</h3>
-                <p className="text-gray-500 font-medium leading-relaxed text-sm">Deployment will be permanently purged from the production grid. This action is irreversible.</p>
+                <h3 className="text-2xl font-bold mb-2 text-black">Terminate Asset?</h3>
+                <p className="text-black opacity-60 font-medium leading-relaxed text-sm">Deployment will be permanently purged from the production grid. This action is irreversible.</p>
               </div>
               
               <div className="flex flex-col gap-3">

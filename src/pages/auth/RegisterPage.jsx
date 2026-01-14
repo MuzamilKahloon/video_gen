@@ -14,7 +14,8 @@ import {
 const AnimatedLine = ({ className = "" }) => (
   <div className={`h-[1px] bg-gray-100 overflow-hidden ${className}`}>
     <motion.div
-      className="w-1/3 h-full bg-yellow-400"
+      className="w-1/3 h-full"
+      style={{ backgroundColor: '#E7F014' }}
       animate={{ x: ["-100%", "300%"] }}
       transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
     />
@@ -143,15 +144,16 @@ const RegisterPage = () => {
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-block bg-black text-yellow-400 font-bold text-[10px] uppercase tracking-widest px-3 py-1 mb-6"
+          className="inline-block bg-white border-2 border-black font-bold text-[10px] uppercase tracking-widest px-3 py-1 mb-6"
+          style={{ color: 'black' }}
         >
           Priority Onboarding
         </motion.div>
         
-        <h1 className="text-4xl font-bold text-black mb-4 tracking-tighter uppercase">
-          Request <span className="text-yellow-400">Access</span>
+        <h1 className="text-4xl font-bold text-black mb-4 md:mb-6 leading-tight uppercase">
+          Request <span style={{ color: '#C5C2BF' }}>Access</span>
         </h1>
-        <p className="text-gray-500 font-medium">
+        <p className="text-base mb-8" style={{ color: '#C5C2BF' }}>
           Join the elite circle of agents using the next generation of real estate AI.
         </p>
       </div>
@@ -219,7 +221,8 @@ const RegisterPage = () => {
             <div className="h-2 bg-gray-100 flex">
               <motion.div 
                 animate={{ width: `${passwordStrength.percentage}%` }}
-                className={`h-full ${passwordStrength.level === 'Strong' ? 'bg-green-500' : 'bg-yellow-400'}`}
+                className="h-full"
+                style={{ backgroundColor: passwordStrength.level === 'Strong' ? '#22c55e' : '#E7F014' }}
               />
             </div>
           </div>
@@ -235,10 +238,10 @@ const RegisterPage = () => {
                 onChange={handleChange}
                 className="peer h-5 w-5 cursor-pointer appearance-none border-2 border-gray-200 bg-white transition-all checked:border-black checked:bg-black"
               />
-              <HiSparkles className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-yellow-400 opacity-0 peer-checked:opacity-100 transition-opacity w-3 h-3" />
+              <HiSparkles className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity w-3 h-3" style={{ color: '#E7F014' }} />
             </div>
-            <span className="text-[10px] font-bold text-gray-500 group-hover:text-black transition-colors uppercase tracking-widest leading-tight">
-              I accept the Loomo <Link to="/terms" className="text-black border-b border-yellow-400">Terms of Elite Service</Link> & <Link to="/privacy" className="text-black border-b border-yellow-400">Privacy Protocols</Link>
+            <span className="text-[10px] font-bold transition-colors uppercase tracking-widest leading-tight" style={{ color: '#C5C2BF' }}>
+              I accept the Loomo <Link to="/terms" className="text-black border-b" style={{ borderBottomColor: '#E7F014' }}>Terms of Elite Service</Link> & <Link to="/privacy" className="text-black border-b" style={{ borderBottomColor: '#E7F014' }}>Privacy Protocols</Link>
             </span>
           </label>
         </div>
@@ -248,7 +251,8 @@ const RegisterPage = () => {
           disabled={loading}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full py-5 bg-yellow-400 text-black font-black uppercase tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-500 transition-all flex items-center justify-center gap-3 group"
+          className="w-full py-5 text-black font-black uppercase tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center gap-3 group mt-12"
+          style={{ backgroundColor: '#E7F014' }}
         >
           {loading ? (
             <div className="w-5 h-5 border-4 border-black/20 border-t-black rounded-full animate-spin" />
@@ -263,7 +267,7 @@ const RegisterPage = () => {
 
       <div className="my-10 relative flex items-center justify-center">
         <AnimatedLine className="absolute w-full" />
-        <span className="relative z-10 bg-white px-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
+        <span className="relative z-10 bg-white px-6 text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: '#C5C2BF' }}>
           Social Connect
         </span>
       </div>
@@ -293,11 +297,12 @@ const RegisterPage = () => {
         </motion.button>
       </div>
 
-      <p className="text-center text-gray-500 mt-12 font-bold text-xs uppercase tracking-widest">
+      <p className="text-center mt-12 font-bold text-xs uppercase tracking-widest" style={{ color: '#C5C2BF' }}>
         Already an Agent?{" "}
         <Link
           to="/login"
-          className="text-black border-b-2 border-yellow-400 hover:border-black transition-all ml-1"
+          className="text-black border-b-2 hover:border-black transition-all ml-1"
+          style={{ borderBottomColor: '#E7F014' }}
         >
           Sign In
         </Link>

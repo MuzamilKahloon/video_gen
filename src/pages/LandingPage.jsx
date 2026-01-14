@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const LandingPage = () => {
   return (
-    <div className="w-full overflow-hidden font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="w-full overflow-hidden" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
       
 
       {/* Hero Section */}
@@ -42,7 +42,10 @@ const LandingPage = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="flex gap-4 flex-wrap justify-center mb-6"
           >
-            <button className="bg-yellow-400 text-black font-medium text-sm px-5 py-2.5 hover:bg-yellow-500 transition">
+            <button 
+              className="text-black font-medium text-sm px-5 py-2.5 transition"
+              style={{ backgroundColor: '#E7F014' }}
+            >
               Create a video →
             </button>
             <button className="bg-white border border-gray-300 text-gray-700 font-medium text-sm px-5 py-2.5 hover:bg-gray-50 transition flex items-center gap-2">
@@ -87,13 +90,16 @@ const LandingPage = () => {
       </section>
 
       {/* Three Cards Section */}
-      <section className="bg-[#f5f5f0] py-12 md:py-16 px-4">
+      <section className="py-12 md:py-16 px-4" style={{ backgroundColor: '#F2F2ED' }}>
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-8 md:mb-10 text-center md:text-left">
             <h2 className="text-2xl md:text-4xl font-bold text-black max-w-2xl leading-tight tracking-tight mb-4 md:mb-0">
               The fastest way to create property videos. Period.
             </h2>
-            <button className="bg-yellow-400 text-black font-semibold text-[10px] uppercase tracking-wider px-4 py-2 whitespace-nowrap md:ml-4 mb-0 md:mb-1">
+            <button 
+              className="text-black font-semibold text-[10px] uppercase tracking-wider px-4 py-2 whitespace-nowrap md:ml-4 mb-0 md:mb-1"
+              style={{ backgroundColor: '#E7F014' }}
+            >
               The easiest platform, ever.
             </button>
           </div>
@@ -172,32 +178,33 @@ const LandingPage = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="bg-yellow-400 rounded-2xl p-6 md:p-10"
+            className="rounded-2xl p-6 md:p-10"
+            style={{ backgroundColor: '#E7F014' }}
           >
             <div className="max-w-4xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div className="bg-gray-100 rounded-xl p-6 md:p-8 text-center md:text-left">
+                <div className="rounded-xl p-6 md:p-8 text-center md:text-left" style={{ backgroundColor: '#F2F2ED' }}>
                   <div className="text-4xl md:text-5xl font-bold mb-2 md:mb-4">20k+</div>
                   <div className="text-lg text-gray-700">
                     Hours reclaimed for<br />agents across the globe.
                   </div>
                 </div>
                 
-                <div className="bg-gray-100 rounded-xl p-6 md:p-8 text-center md:text-left">
+                <div className="rounded-xl p-6 md:p-8 text-center md:text-left" style={{ backgroundColor: '#F2F2ED' }}>
                   <div className="text-4xl md:text-5xl font-bold mb-2 md:mb-4">1M+</div>
                   <div className="text-base md:text-lg text-gray-700">
                     Dollars eliminated from<br className="hidden md:block" />unnecessary production costs
                   </div>
                 </div>
                 
-                <div className="bg-gray-100 rounded-xl p-6 md:p-8 text-center md:text-left">
+                <div className="rounded-xl p-6 md:p-8 text-center md:text-left" style={{ backgroundColor: '#F2F2ED' }}>
                   <div className="text-4xl md:text-5xl font-bold mb-2 md:mb-4">0</div>
                   <div className="text-base md:text-lg text-gray-700">
                     Friction from listing<br className="hidden md:block" />to video
                   </div>
                 </div>
                 
-                <div className="bg-gray-100 rounded-xl p-6 md:p-8 text-center md:text-left">
+                <div className="rounded-xl p-6 md:p-8 text-center md:text-left" style={{ backgroundColor: '#F2F2ED' }}>
                   <div className="text-4xl md:text-5xl font-bold mb-2 md:mb-4">20k+</div>
                   <div className="text-base md:text-lg text-gray-700">
                     hours reclaimed for<br className="hidden md:block" />agents across the globe.
@@ -210,7 +217,7 @@ const LandingPage = () => {
       </section>
 
       {/* Comparison Section */}
-      <section className="bg-[#f5f5f0] py-12 md:py-20 px-4">
+      <section className="py-12 md:py-20 px-4" style={{ backgroundColor: '#F2F2ED' }}>
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold text-center mb-10 md:mb-16">
             Loomo vs The Old Way
@@ -254,7 +261,7 @@ const LandingPage = () => {
               className="bg-black rounded-2xl p-6 md:p-10 relative"
             >
               <div className="absolute top-4 right-4 md:top-6 md:right-6">
-                <span className="bg-yellow-400 text-black text-[10px] font-bold px-3 py-1">
+                <span className="text-black text-[10px] font-bold px-3 py-1" style={{ backgroundColor: '#E7F014' }}>
                   The easiest platform, ever.
                 </span>
               </div>
@@ -322,7 +329,7 @@ const LandingPage = () => {
                       <div className="w-12 h-12 bg-gray-300 rounded-lg flex-shrink-0"></div>
                       <div>
                         <div className="font-semibold text-sm">Huseyin Ozselishitoglu</div>
-                        <div className="text-gray-500 text-xs">Sales Agent</div>
+                        <div className="text-gray-500 text-xs" style={{ color: '#C5C2BF' }}>Sales Agent</div>
                       </div>
                     </div>
                     <div className="w-14 h-14 bg-teal-700 rounded-lg flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
@@ -352,7 +359,10 @@ const LandingPage = () => {
               </h2>
               
               <div className="flex justify-center md:justify-start">
-                <button className="bg-yellow-400 text-black font-semibold px-6 py-3 mb-6 md:mb-8 hover:bg-yellow-500 transition flex items-center gap-2">
+                <button 
+                  className="text-black font-semibold px-6 py-3 mb-6 md:mb-8 transition flex items-center gap-2"
+                  style={{ backgroundColor: '#E7F014' }}
+                >
                   Create a video →
                 </button>
               </div>

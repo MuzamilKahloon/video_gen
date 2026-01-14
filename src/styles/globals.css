@@ -1,5 +1,16 @@
-/* client/src/styles/globals.css */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/NeueMontreal-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/NeueMontreal-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
 
 @tailwind base;
 @tailwind components;
@@ -17,7 +28,8 @@
 	}
 
 	body {
-		@apply bg-surface-secondary text-text-primary font-sans text-base;
+		@apply bg-surface-secondary text-text-primary text-base;
+		font-family: 'Neue Montreal', sans-serif;
 	}
 
 	/* Custom scrollbar - Light theme */

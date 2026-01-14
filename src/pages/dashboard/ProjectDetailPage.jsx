@@ -15,9 +15,10 @@ import StatusBadge from "@components/ui/StatusBadge";
 
 // Signature animated line
 const AnimatedLine = ({ className = "" }) => (
-  <div className={`h-[1px] bg-gray-200 overflow-hidden ${className}`}>
+  <div className={`h-[1px] bg-black/5 overflow-hidden ${className}`}>
     <motion.div
-      className="w-1/3 h-full bg-yellow-400"
+      className="w-1/3 h-full"
+      style={{ backgroundColor: '#E7F014' }}
       animate={{ x: ["-100%", "300%"] }}
       transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
     />
@@ -26,11 +27,11 @@ const AnimatedLine = ({ className = "" }) => (
 
 const Button = ({ children, className = "", variant = "primary", ...props }) => {
   const variants = {
-    primary: "bg-black text-white hover:bg-yellow-400 hover:text-black transition-all duration-300 font-bold",
-    secondary: "bg-white border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 text-black font-bold",
-    ghost: "bg-gray-50 hover:bg-gray-100 text-gray-500 hover:text-black transition-all font-bold",
-    danger: "bg-red-50 hover:bg-red-600 hover:text-white transition-all font-bold",
-    icon: "bg-white border border-gray-100 shadow-sm hover:bg-yellow-400 hover:text-black transition-all"
+    primary: "bg-[#E7F014] text-black hover:bg-black hover:text-white transition-all duration-300 font-bold",
+    secondary: "bg-white border border-black/10 shadow-sm hover:shadow-lg transition-all duration-300 text-black font-bold",
+    ghost: "bg-black/5 hover:bg-black/10 text-black opacity-40 hover:opacity-100 transition-all font-bold",
+    danger: "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all font-bold",
+    icon: "bg-white border border-black/10 shadow-sm hover:bg-[#E7F014] hover:text-black transition-all"
   };
   return (
     <button className={cn("px-6 py-3 flex items-center justify-center gap-2 uppercase text-[10px] tracking-widest", variants[variant], className)} {...props}>
@@ -51,9 +52,9 @@ const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
         className={cn("bg-white shadow-2xl w-full overflow-hidden", sizes[size])} 
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-8 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-xl font-black tracking-tight text-black uppercase">{title}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 transition-colors text-gray-400">
+        <div className="p-8 border-b border-black/5 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-black">{title}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-black/5 transition-colors text-black/40 hover:text-black">
             <HiX className="w-5 h-5" />
           </button>
         </div>
@@ -110,7 +111,7 @@ const VideoPlayer = ({ videoUrl, thumbnail }) => {
       <AnimatePresence>
         {!isPlaying && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-            <button onClick={togglePlay} className="w-20 h-20 bg-yellow-400 text-black hover:scale-110 transition-transform flex items-center justify-center">
+            <button onClick={togglePlay} className="w-20 h-20 text-black hover:scale-110 transition-transform flex items-center justify-center" style={{ backgroundColor: '#E7F014' }}>
               <HiPlay className="w-10 h-10 ml-1" />
             </button>
           </motion.div>
@@ -119,7 +120,7 @@ const VideoPlayer = ({ videoUrl, thumbnail }) => {
 
       <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6 transition-opacity duration-500 ${showControls || !isPlaying ? "opacity-100" : "opacity-0"}`}>
         <div className="w-full h-1 bg-white/20 mb-4 cursor-pointer relative group/timeline" onClick={handleSeek}>
-          <div className="absolute h-full bg-yellow-400" style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }} />
+          <div className="absolute h-full" style={{ backgroundColor: '#E7F014', width: `${duration ? (currentTime / duration) * 100 : 0}%` }} />
           <div className="absolute h-3 w-3 bg-white rounded-full -top-1 opacity-0 group-hover/timeline:opacity-100 transition-opacity" style={{ left: `${duration ? (currentTime / duration) * 100 : 0}%` }} />
         </div>
         
@@ -136,7 +137,7 @@ const VideoPlayer = ({ videoUrl, thumbnail }) => {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="bg-yellow-400 text-black text-[10px] font-black px-2 py-0.5 uppercase tracking-tighter">HD 1080P</span>
+            <span className="text-black text-[10px] font-bold px-2 py-0.5 uppercase" style={{ backgroundColor: '#E7F014' }}>HD 1080P</span>
           </div>
         </div>
       </div>
@@ -149,21 +150,21 @@ const ImageGallery = ({ images }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (!images?.length) return (
-    <div className="aspect-video bg-[#f9f9f7] flex items-center justify-center border border-gray-100">
-      <p className="text-gray-400 font-bold tracking-widest uppercase text-[10px]">No Assets detected</p>
+    <div className="aspect-video bg-[#F2F2ED] flex items-center justify-center border border-black/5">
+      <p className="text-black opacity-40 font-bold tracking-widest uppercase text-[10px]">No Assets detected</p>
     </div>
   );
 
   return (
     <div>
-      <div className="relative aspect-video bg-[#f9f9f7] overflow-hidden mb-6 cursor-pointer group" onClick={() => setIsModalOpen(true)}>
+      <div className="relative aspect-video bg-[#F2F2ED] overflow-hidden mb-6 cursor-pointer group" onClick={() => setIsModalOpen(true)}>
         <img src={images[selectedIndex]?.url} alt={`Image ${selectedIndex + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <div className="w-12 h-12 bg-yellow-400 text-black flex items-center justify-center">
+            <div className="w-12 h-12 text-black flex items-center justify-center" style={{ backgroundColor: '#E7F014' }}>
               <HiPhotograph className="w-6 h-6" />
             </div>
         </div>
-        <div className="absolute bottom-6 right-6 px-4 py-2 bg-black text-white text-[10px] font-black uppercase tracking-widest">{selectedIndex + 1} / {images.length}</div>
+        <div className="absolute bottom-6 right-6 px-4 py-2 bg-[#E7F014] text-black text-[10px] font-black uppercase tracking-widest">{selectedIndex + 1} / {images.length}</div>
       </div>
 
       <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
@@ -173,8 +174,9 @@ const ImageGallery = ({ images }) => {
             onClick={() => setSelectedIndex(index)} 
             className={cn(
               "aspect-square overflow-hidden transition-all duration-300 relative",
-              selectedIndex === index ? "border-2 border-yellow-400" : "opacity-40 hover:opacity-100"
+              selectedIndex === index ? "border-2" : "opacity-40 hover:opacity-100"
             )}
+            style={selectedIndex === index ? { borderColor: '#E7F014' } : {}}
           >
             <img src={image.thumbnail || image.url} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
           </button>
@@ -261,17 +263,17 @@ export default function ProjectDetailPage() {
   };
 
   if (isLoading) return (
-    <div className="min-h-screen bg-[#f9f9f7] p-12 flex flex-col items-center justify-center">
-       <div className="w-12 h-12 border-4 border-black border-t-yellow-400 rounded-full animate-spin mb-4" />
-       <p className="font-black tracking-[0.3em] text-[10px] uppercase text-gray-400">Syncing Stream Data</p>
+    <div className="min-h-screen bg-[#F2F2ED] p-12 flex flex-col items-center justify-center" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
+       <div className="w-12 h-12 border-4 border-black/10 rounded-full animate-spin mb-4" style={{ borderTopColor: '#E7F014' }} />
+       <p className="font-black tracking-[0.3em] text-[10px] uppercase text-black opacity-40">Syncing Stream Data</p>
     </div>
   );
 
   if (!project) return (
-    <div className="min-h-screen bg-[#f9f9f7] p-12 flex items-center justify-center">
-      <div className="bg-black text-white p-12 shadow-2xl max-w-lg text-center">
-        <h3 className="text-3xl font-black tracking-tight mb-4 uppercase">404: Missing Node</h3>
-        <p className="text-gray-400 font-medium mb-8 leading-relaxed">The requested cinematic deployment has been decommissioned or moved from the production grid.</p>
+    <div className="min-h-screen bg-[#F2F2ED] p-12 flex items-center justify-center" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
+      <div className="bg-white border border-black/5 p-12 shadow-2xl max-w-lg text-center">
+        <h3 className="text-3xl font-bold mb-4 text-black">404: Missing Node</h3>
+        <p className="text-black opacity-40 font-medium mb-8 leading-relaxed">The requested cinematic deployment has been decommissioned or moved from the production grid.</p>
         <Link to="/dashboard/projects">
           <Button variant="primary">Return to Workspace</Button>
         </Link>
@@ -280,13 +282,13 @@ export default function ProjectDetailPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#f9f9f7] text-black font-['Plus_Jakarta_Sans',sans-serif] p-6 lg:p-12">
+    <div className="min-h-screen bg-[#F2F2ED] text-black p-6 lg:p-12" style={{ fontFamily: "'Neue Montreal', sans-serif" }}>
       <Helmet><title>MASTER | {project.title}</title></Helmet>
       
       <div className="max-w-7xl mx-auto">
         {/* Navigation & Header */}
         <div className="mb-12">
-          <Link to="/dashboard/projects" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors mb-8 group">
+          <Link to="/dashboard/projects" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black opacity-40 hover:opacity-100 transition-colors mb-8 group">
             <HiArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Workspace
           </Link>
           
@@ -294,12 +296,12 @@ export default function ProjectDetailPage() {
             <div className="max-w-3xl">
               <div className="flex items-center gap-4 mb-4">
                 <StatusBadge status={project.status} />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300">STREAM-ID: {project._id?.slice(-8).toUpperCase()}</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black opacity-30">STREAM-ID: {project._id?.slice(-8).toUpperCase()}</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-black text-black tracking-tighter leading-none mb-6 uppercase">
-                {project.title.split(' ')[0]} <span className="text-gray-300">{project.title.split(' ').slice(1).join(' ')}</span>
+              <h1 className="text-4xl md:text-6xl font-bold text-black leading-tight mb-4 md:mb-6">
+                {project.title.split(' ')[0]} <span className="opacity-40">{project.title.split(' ').slice(1).join(' ')}</span>
               </h1>
-              <p className="text-lg text-gray-500 font-medium max-w-2xl leading-relaxed">
+              <p className="text-black opacity-60 text-base max-w-2xl">
                 {project.description}
               </p>
             </div>
@@ -322,23 +324,23 @@ export default function ProjectDetailPage() {
         {/* Operational Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content Area */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8 text-black">
             {/* Visual Output */}
-            <div className="bg-white p-2 border border-gray-100 shadow-sm relative group">
+            <div className="bg-white p-2 border border-black/5 shadow-sm relative group">
                <VideoPlayer videoUrl={project.video?.url} thumbnail={project.images?.[0]?.url} />
                <AnimatedLine className="absolute bottom-0 left-0 right-0" />
             </div>
 
             {/* Source Materials */}
-            <div className="bg-white border border-gray-100 shadow-sm relative group overflow-hidden">
-              <div className="p-8 border-b border-gray-50 flex items-center justify-between">
+            <div className="bg-white border border-black/5 shadow-sm relative group overflow-hidden">
+              <div className="p-8 border-b border-black/5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-[#f9f9f7] flex items-center justify-center group-hover:bg-yellow-400 transition-colors">
-                    <HiPhotograph className="w-5 h-5 text-gray-400 group-hover:text-black" />
+                  <div className="w-10 h-10 bg-[#F2F2ED] flex items-center justify-center transition-colors">
+                    <HiPhotograph className="w-5 h-5 text-black opacity-30" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black tracking-tight uppercase">Raw Pipeline Assets</h3>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{project.images?.length || 0} Frames Ingested</p>
+                    <h3 className="text-xl font-bold">Raw Pipeline Assets</h3>
+                    <p className="text-[10px] font-bold text-black opacity-40 uppercase tracking-widest">{project.images?.length || 0} Frames Ingested</p>
                   </div>
                 </div>
               </div>
@@ -352,8 +354,8 @@ export default function ProjectDetailPage() {
           {/* Sidebar Area */}
           <div className="space-y-8">
             {/* Specs Block */}
-            <div className="bg-black text-white p-8 shadow-2xl relative overflow-hidden group">
-               <h3 className="text-xl font-black tracking-tight uppercase mb-8 border-b border-white/10 pb-4">Specifications</h3>
+            <div className="bg-white border border-black/5 p-8 shadow-2xl relative overflow-hidden group">
+               <h3 className="text-xl font-bold mb-8 border-b border-black/5 pb-4">Specifications</h3>
                
                <div className="space-y-6">
                  {[
@@ -364,38 +366,38 @@ export default function ProjectDetailPage() {
                    { label: "Node Cost", value: `${project.creditsUsed} CR`, icon: HiLightningBolt, active: true },
                  ].map((spec) => (
                    <div key={spec.label} className="flex items-center justify-between">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                     <span className="text-[10px] font-black uppercase tracking-widest text-black opacity-40 flex items-center gap-2">
                        <spec.icon className="w-3.5 h-3.5" /> {spec.label}
                      </span>
-                     <span className={cn("text-xs font-bold tracking-tight", spec.active ? "text-yellow-400" : "text-white")}>{spec.value}</span>
+                     <span className={cn("text-xs font-bold tracking-tight", spec.active ? "text-black" : "text-black opacity-80")}>{spec.value}</span>
                    </div>
                  ))}
                </div>
                
-               <div className="mt-12 pt-6 border-t border-white/10 space-y-3">
+               <div className="mt-12 pt-6 border-t border-black/5 space-y-3">
                   <div className="flex items-center justify-between text-[10px]">
-                    <span className="font-black uppercase tracking-widest text-zinc-600">Generated</span>
-                    <span className="font-bold text-zinc-400 font-mono tracking-tighter">{formatDate(project.createdAt)}</span>
+                    <span className="font-black uppercase tracking-widest text-black opacity-40">Generated</span>
+                    <span className="font-bold text-black opacity-60 font-mono tracking-tighter">{formatDate(project.createdAt)}</span>
                   </div>
                   <div className="flex items-center justify-between text-[10px]">
-                    <span className="font-black uppercase tracking-widest text-zinc-600">Certified</span>
-                    <span className="font-bold text-zinc-400 font-mono tracking-tighter">{formatDate(project.completedAt)}</span>
+                    <span className="font-black uppercase tracking-widest text-black opacity-40">Certified</span>
+                    <span className="font-bold text-black opacity-60 font-mono tracking-tighter">{formatDate(project.completedAt)}</span>
                   </div>
                </div>
                <AnimatedLine className="absolute bottom-0 left-0 right-0" />
             </div>
 
             {/* Operations Block */}
-            <div className="bg-white border border-gray-100 p-8 shadow-sm">
-               <h3 className="text-xl font-black tracking-tight uppercase mb-6">Operations</h3>
+            <div className="bg-white border border-black/5 p-8 shadow-sm text-black">
+               <h3 className="text-xl font-bold mb-6">Operations</h3>
                <div className="space-y-3">
-                 <button onClick={handleDuplicate} className="w-full p-4 bg-[#f9f9f7] flex items-center justify-between hover:bg-black hover:text-white transition-all group/opt">
-                    <span className="text-[10px] font-black uppercase tracking-widest">Duplicate Master</span>
-                    <HiDuplicate className="w-5 h-5 text-gray-300 group-hover/opt:text-yellow-400 transition-colors" />
+                 <button onClick={handleDuplicate} className="w-full p-4 bg-[#F2F2ED] flex items-center justify-between hover:bg-[#E7F014] transition-all group/opt">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-black">Duplicate Master</span>
+                    <HiDuplicate className="w-5 h-5 text-black opacity-20 group-hover/opt:opacity-100 transition-colors" />
                  </button>
-                 <button onClick={() => setShowEditModal(true)} className="w-full p-4 bg-[#f9f9f7] flex items-center justify-between hover:bg-black hover:text-white transition-all group/opt">
-                    <span className="text-[10px] font-black uppercase tracking-widest">Modify Metadata</span>
-                    <HiPencil className="w-5 h-5 text-gray-300 group-hover/opt:text-yellow-400 transition-colors" />
+                 <button onClick={() => setShowEditModal(true)} className="w-full p-4 bg-[#F2F2ED] flex items-center justify-between hover:bg-[#E7F014] transition-all group/opt">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-black">Modify Metadata</span>
+                    <HiPencil className="w-5 h-5 text-black opacity-20 group-hover/opt:opacity-100 transition-colors" />
                  </button>
                  <button onClick={() => setShowDeleteModal(true)} className="w-full p-4 bg-red-50 text-red-600 flex items-center justify-between hover:bg-red-600 hover:text-white transition-all group/opt">
                     <span className="text-[10px] font-black uppercase tracking-widest">Decommission Asset</span>
@@ -406,16 +408,16 @@ export default function ProjectDetailPage() {
             
             {/* Asset Data Data Block */}
             {project.status === "completed" && project.video && (
-               <div className="bg-white border border-gray-100 p-8 shadow-sm relative group overflow-hidden">
-                  <h3 className="text-xl font-black tracking-tight uppercase mb-6">Payload Metadata</h3>
+               <div className="bg-white border border-black/5 p-8 shadow-sm relative group overflow-hidden text-black">
+                  <h3 className="text-xl font-bold mb-6">Payload Metadata</h3>
                   <div className="space-y-4">
                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Size</span>
-                        <span className="text-xs font-bold">{formatFileSize(project.video.size)}</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-black opacity-40">Total Size</span>
+                        <span className="text-xs font-bold text-black">{formatFileSize(project.video.size)}</span>
                      </div>
                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Master Type</span>
-                        <span className="text-xs font-bold uppercase tracking-tighter">{project.video.format} / H.264</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-black opacity-40">Master Type</span>
+                        <span className="text-xs font-bold text-black uppercase tracking-tighter">{project.video.format} / H.264</span>
                      </div>
                      <Button variant="primary" className="w-full py-4 mt-6 text-[10px] tracking-[0.2em] uppercase" onClick={() => toast.success("Export Initialized")}>
                         <HiDownload className="w-4 h-4" /> Export Data Block
@@ -437,8 +439,8 @@ export default function ProjectDetailPage() {
                 <div className="w-16 h-16 bg-red-50 flex items-center justify-center mx-auto mb-6">
                   <HiTrash className="w-8 h-8 text-red-600" />
                 </div>
-                <h3 className="text-2xl font-black tracking-tight mb-2 uppercase">Terminate Asset?</h3>
-                <p className="text-gray-500 font-medium leading-relaxed text-sm">Target sequence will be permanently removed from the production grid. This action is irreversible.</p>
+                <h3 className="text-2xl font-bold mb-2 text-black">Terminate Asset?</h3>
+                <p className="text-black opacity-60 font-medium leading-relaxed text-sm">Target sequence will be permanently removed from the production grid. This action is irreversible.</p>
               </div>
               <div className="flex flex-col gap-3">
                 <Button onClick={handleDelete} variant="danger" className="w-full py-4">
@@ -455,13 +457,13 @@ export default function ProjectDetailPage() {
         {showShareModal && (
           <Modal isOpen={showShareModal} onClose={() => setShowShareModal(false)} title="Master Node Token">
             <div className="space-y-6">
-              <p className="text-gray-500 font-medium text-sm">Generate a high-bandwidth access link for this deployment.</p>
-              <div className="flex items-center gap-2 p-2 bg-[#f9f9f7] border border-gray-100">
+              <p className="text-black opacity-40 font-medium text-sm">Generate a high-bandwidth access link for this deployment.</p>
+              <div className="flex items-center gap-2 p-2 bg-black/5 border border-black/5">
                 <input
                   type="text"
                   value={project.video?.url || ""}
                   readOnly
-                  className="flex-1 bg-transparent border-none outline-none text-[10px] font-bold text-gray-400 px-4 font-mono"
+                  className="flex-1 bg-transparent border-none outline-none text-[10px] font-bold text-black opacity-40 px-4 font-mono"
                 />
                 <Button onClick={() => { navigator.clipboard.writeText(project.video?.url || ""); toast.success("Token Synced"); }} className="py-2 px-6">
                   Copy
@@ -484,19 +486,19 @@ export default function ProjectDetailPage() {
               }, 800);
             }} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Node Identifier</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-black opacity-40">Node Identifier</label>
                 <input
                   name="title"
                   defaultValue={project.title}
-                  className="w-full bg-[#f9f9f7] border border-gray-100 p-4 text-sm font-bold outline-none focus:border-yellow-400 transition-colors"
+                  className="w-full bg-[#f9f9f7] border border-black/5 p-4 text-sm font-bold outline-none focus:border-[#E7F014] text-black transition-colors"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Production Brief</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-black opacity-40">Production Brief</label>
                 <textarea
                   name="description"
                   defaultValue={project.description}
-                  className="w-full bg-[#f9f9f7] border border-gray-100 p-4 text-sm font-bold outline-none focus:border-yellow-400 transition-colors min-h-[120px] resize-none"
+                  className="w-full bg-[#f9f9f7] border border-black/5 p-4 text-sm font-bold outline-none focus:border-[#E7F014] text-black transition-colors min-h-[120px] resize-none"
                 />
               </div>
               <div className="flex gap-4 pt-4">
